@@ -1,5 +1,5 @@
 const DbHelper = require('./db.helper');
-const User = require('../user.model');
+const User = require('../models/user.model');
 
 class UserRepository extends DbHelper {
   constructor() {
