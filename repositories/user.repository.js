@@ -8,6 +8,20 @@ class UserRepository extends DbHelper {
     this.tableName = 'users';
     this.colId = 'user_id';
   }
+
+  findOneByPhoneNumber(phoneNumber) {
+    const user = new User();
+    user.phoneNumber = phoneNumber;
+
+    return this.findOne(user);
+  }
+
+  findOneByCognitoId(cognitoId) {
+    const user = new User();
+    user.cognitoId = cognitoId;
+
+    return this.findOne(user);
+  }
 }
 
 module.exports = new UserRepository();

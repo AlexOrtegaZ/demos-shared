@@ -63,10 +63,11 @@ class DbHelper {
       await client.connect();
       const query = `SELECT * FROM ${this.tableName} WHERE ${columns
         .map((column, index) => `${column} = $${index + 1}`)
-        .join(' AND ')}`;
+        .join(' AND ')} LIMIT 1`;
       const res = await client.query(query, values);
       await client.end();
-      return mapObjectToCamelCased(res.rows[0]);
+      const rowObject = res.rows[0];
+      return rowObject ? mapObjectToCamelCased(rowObject) : null;
     }
     throw Error('No values to save');
   }
@@ -95,7 +96,7 @@ class DbHelper {
       await client.connect();
       const query = `UPDATE ${this.tableName} 
         SET ${columns.map((column, index) => `${column} = $${index + 1}`).join(' ')}
-        WHERE ${this.colId} = ${id} RETURNING *`;
+        WHERE ${this.colId} = '${id}' RETURNING *`;
       const res = await client.query(query, values);
       await client.end();
       return mapObjectToCamelCased(res.rows[0]);
