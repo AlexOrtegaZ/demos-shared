@@ -1,6 +1,6 @@
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const jwkToPem = require('jwk-to-pem');
-const { tokenTypes } = require('./tokens');
+const { tokenTypes } = require('../enums/tokens');
 const jwks = require('../../../jwks.json');
 
 const jwtOptions = {
