@@ -89,6 +89,9 @@ class DbHelper {
   }
 
   async save(id, object) {
+    if (typeof id === 'object' && id !== null) {
+      throw Error(`Id and object required to save ${this.entityName}`);
+    }
     this._validateObject(object);
     const [columns, values] = getColumnsAndValues(object);
     if (columns.length > 0) {
