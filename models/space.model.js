@@ -4,8 +4,8 @@ class Space {
     this.name = '';
     this.description = '';
     this.pictureKey = '';
-    this.approvalPercentage = 50;
-    this.participationPercentage = 50;
+    this.approvalPercentage = undefined;
+    this.participationPercentage = undefined;
     this.ownerId = '';
     this.createdAt = undefined;
     this.updatedAt = undefined;
