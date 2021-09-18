@@ -72,6 +72,22 @@ class DbHelper {
     throw Error('No values to save');
   }
 
+  async findAll(object) {
+    this._validateObject(object);
+    const [columns, values] = getColumnsAndValues(object);
+    if (columns.length > 0) {
+      const client = getPgClient();
+      await client.connect();
+      const query = `SELECT * FROM ${this.tableName} WHERE ${columns
+        .map((column, index) => `${column} = $${index + 1}`)
+        .join(' AND ')}`;
+      const res = await client.query(query, values);
+      await client.end();
+      return res.rows.map((rowObject) => mapObjectToCamelCased(rowObject));
+    }
+    throw Error('No values to save');
+  }
+
   async create(object) {
     this._validateObject(object);
     const [columns, values] = getColumnsAndValues(object);
