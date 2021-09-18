@@ -25,6 +25,37 @@ components:
         cognitoId: '0d28c258-3bef-4cac-b04f-66a5488f94f6'
         createdAt: '2021-08-04 22:49:49.906226'
         updatedAt: '2021-08-04 22:49:49.906226'
+    Space:
+      type: object
+      properties:
+        spaceId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        pictureKey:
+          type: string
+        approvalPercentage:
+          type: number
+        participationPercentage:
+          type: number
+        ownerId:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        spaceId: 'ef82ab99-0998-46f2-bb8b-7bdda5ae61bb' 
+        name: 'Nombre del espacio'
+        description: 'Descripcion del espacio'
+        pictureKey: null
+        approvalPercentage: 60
+        participationPercentage: 60
+        ownerId: 'ffc7ca5f-db51-48f0-9377-d8bc8fe34220'
+        createdAt: '2021-08-22T04:56:25.129Z'
+        updatedAt: '2021-08-22T04:56:25.129Z'
 
     LoginResponse:
       type: object
