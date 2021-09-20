@@ -9,11 +9,14 @@ class UserRepository extends DbHelper {
     this.colId = 'user_id';
   }
 
-  findOneByPhoneNumber(phoneNumber) {
-    const user = new User();
-    user.phoneNumber = phoneNumber;
-
-    return this.findOne(user);
+  async findOneByPhoneNumber(phoneNumber) {
+    const client = this.getPgClient();
+    await client.connect();
+    const query = `SELECT * FROM ${this.tableName} WHERE phone_number LIKE $1 LIMIT 1`;
+    const res = await client.query(query, [`%${phoneNumber}`]);
+    await client.end();
+    const rowObject = res.rows[0];
+    return rowObject ? this.mapObjectToCamelCased(rowObject) : null;
   }
 
   findOneByCognitoId(cognitoId) {

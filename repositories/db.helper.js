@@ -27,25 +27,10 @@ function getColumnsAndValues(object) {
   return [columns, values];
 }
 
-function getPgClient() {
-  return new Client({ ssl: { rejectUnauthorized: false } });
-}
-
 function convertPropNameToCamelCase(name) {
   return name.replace(/_([a-z])/g, function (g) {
     return g[1].toUpperCase();
   });
-}
-
-function mapObjectToCamelCased(object) {
-  const newObject = {};
-  Object.keys(object).forEach((key) => {
-    const property = convertPropNameToCamelCase(key);
-    const value = object[key];
-    newObject[property] = value;
-  });
-
-  return newObject;
 }
 
 class DbHelper {
@@ -55,19 +40,20 @@ class DbHelper {
     this.colId = '';
   }
 
-  async findOne(object) {
+  async findOne(object, notColumns = []) {
     this._validateObject(object);
     const [columns, values] = getColumnsAndValues(object);
     if (columns.length > 0) {
-      const client = getPgClient();
+      const client = this.getPgClient();
       await client.connect();
-      const query = `SELECT * FROM ${this.tableName} WHERE ${columns
-        .map((column, index) => `${column} = $${index + 1}`)
-        .join(' AND ')} LIMIT 1`;
+      const whereQuery = columns
+        .map((column, index) => `${column} ${notColumns.some((x) => x === column) ? '!' : ''}= $${index + 1}`)
+        .join(' AND ');
+      const query = `SELECT * FROM ${this.tableName} WHERE ${whereQuery} LIMIT 1`;
       const res = await client.query(query, values);
       await client.end();
       const rowObject = res.rows[0];
-      return rowObject ? mapObjectToCamelCased(rowObject) : null;
+      return rowObject ? this.mapObjectToCamelCased(rowObject) : null;
     }
     throw Error('No values to save');
   }
@@ -76,14 +62,14 @@ class DbHelper {
     this._validateObject(object);
     const [columns, values] = getColumnsAndValues(object);
     if (columns.length > 0) {
-      const client = getPgClient();
+      const client = this.getPgClient();
       await client.connect();
       const query = `SELECT * FROM ${this.tableName} WHERE ${columns
         .map((column, index) => `${column} = $${index + 1}`)
         .join(' AND ')}`;
       const res = await client.query(query, values);
       await client.end();
-      return res.rows.map((rowObject) => mapObjectToCamelCased(rowObject));
+      return res.rows.map((rowObject) => this.mapObjectToCamelCased(rowObject));
     }
     throw Error('No values to save');
   }
@@ -92,14 +78,14 @@ class DbHelper {
     this._validateObject(object);
     const [columns, values] = getColumnsAndValues(object);
     if (columns.length > 0) {
-      const client = getPgClient();
+      const client = this.getPgClient();
       await client.connect();
       const query = `INSERT INTO ${this.tableName}(${columns.join(',')}) VALUES(${columns
         .map((c, index) => `$${index + 1}`)
         .join(',')}) RETURNING *`;
       const res = await client.query(query, values);
       await client.end();
-      return mapObjectToCamelCased(res.rows[0]);
+      return this.mapObjectToCamelCased(res.rows[0]);
     }
     throw Error('No values to create');
   }
@@ -111,16 +97,33 @@ class DbHelper {
     this._validateObject(object);
     const [columns, values] = getColumnsAndValues(object);
     if (columns.length > 0) {
-      const client = getPgClient();
+      const client = this.getPgClient();
       await client.connect();
       const query = `UPDATE ${this.tableName} 
         SET ${columns.map((column, index) => `${column} = $${index + 1}`).join(' ')}
         WHERE ${this.colId} = '${id}' RETURNING *`;
       const res = await client.query(query, values);
       await client.end();
-      return mapObjectToCamelCased(res.rows[0]);
+      return this.mapObjectToCamelCased(res.rows[0]);
     }
     throw Error('No values to save');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getPgClient() {
+    return new Client({ ssl: { rejectUnauthorized: false } });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  mapObjectToCamelCased(object) {
+    const newObject = {};
+    Object.keys(object).forEach((key) => {
+      const property = convertPropNameToCamelCase(key);
+      const value = object[key];
+      newObject[property] = value;
+    });
+
+    return newObject;
   }
 
   _validateObject(object) {
