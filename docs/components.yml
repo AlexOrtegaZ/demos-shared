@@ -57,6 +57,26 @@ components:
         createdAt: '2021-08-22T04:56:25.129Z'
         updatedAt: '2021-08-22T04:56:25.129Z'
 
+    Invitations:
+      type: object
+      propierties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvitationItem'
+      example:
+        users:
+          - phoneNumber: '+524433223344'
+          - userId: 'ffc7ca5f-db51-48f0-9377-d8bc8fe34220'
+
+    InvitationItem:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+        userId:
+          type: string
+
     LoginResponse:
       type: object
       properties:
