@@ -12,7 +12,7 @@ class SocketService {
     if (this._connection !== null) {
       return this._connection;
     }
-    logger.log(`Getting new connection(${new Date().toISOString()})`);
+    logger.info(`Getting new connection(${new Date().toISOString()})`);
     const newConnection = await this._createConnection();
     this._connection = newConnection;
     return newConnection;
@@ -27,7 +27,7 @@ class SocketService {
         rej(Error('Connect Error'));
       });
       this._client.on('connect', (connection) => {
-        logger.log('WebSocket Client Connected');
+        logger.info('WebSocket Client Connected');
         this._initializeOnErrorListener(connection);
         this._initializeOnCloseListener(connection);
         res(connection);
@@ -41,21 +41,21 @@ class SocketService {
 
   _initializeOnErrorListener(connection) {
     connection.on('error', function (error) {
-      logger.log(`Connection Error: ${error.toString()}`);
+      logger.info(`Connection Error: ${error.toString()}`);
     });
   }
 
   _initializeOnCloseListener(connection) {
     connection.on('close', () => {
       this._connection = null;
-      logger.log('echo-protocol Connection Closed');
+      logger.info('echo-protocol Connection Closed');
     });
   }
 
   async emit(userId, eventName) {
     const message = JSON.stringify([userId, eventName]);
     const connection = await this._getConnection();
-    logger.log(`Message sended to: ${userId}`);
+    logger.info(`Message sended to: ${userId}`);
     connection.sendUTF(message);
   }
 }

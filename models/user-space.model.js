@@ -4,7 +4,7 @@ class UserSpace {
     this.spaceId = '';
     this.userId = '';
     this.invitationStatus = 0;
-    this.deleted = false;
+    this.deleted = undefined;
     this.createdBy = '';
     this.updatedBy = '';
     this.createdAt = undefined;
