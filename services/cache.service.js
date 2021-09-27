@@ -1,15 +1,13 @@
 const socketService = require('./socket.service');
 
+const eventsName = {
+  newCache: 'cache:new',
+};
+
 class CacheService {
-    _eventsName = {
-        newCache: 'cache:new',
-    };
-
-    constructor() { }
-
-    emitUpdateCache(usersId) {
-        socketService.emit(usersId, this._eventsName.newCache);
-    }
+  emitUpdateCache(usersId) {
+    socketService.emit(usersId, eventsName.newCache);
+  }
 }
 
 module.exports = new CacheService();
