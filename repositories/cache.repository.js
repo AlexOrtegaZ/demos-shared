@@ -9,11 +9,13 @@ class CacheRepository extends DbHelper {
     this.colId = 'cache_id';
   }
 
-  findAllByUserId(userId) {
+  findAllByUserIdAfterDate(userId, lastUpdatedDate) {
     const cache = new Cache();
     cache.userId = userId;
+    const dateQuery = lastUpdatedDate ? `AND created_at > '${lastUpdatedDate}'` : ''
+    const additionalWhereQuery = `${dateQuery} ORDER BY created_at ASC`;
 
-    return this.findAll(cache);
+    return this.findAll(cache, additionalWhereQuery);
   }
 }
 

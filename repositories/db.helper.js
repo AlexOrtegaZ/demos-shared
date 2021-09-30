@@ -58,7 +58,7 @@ class DbHelper {
     throw Error('No values to save');
   }
 
-  async findAll(object) {
+  async findAll(object, additionalWhereQuery = '') {
     this._validateObject(object);
     const [columns, values] = getColumnsAndValues(object);
     if (columns.length > 0) {
@@ -66,7 +66,7 @@ class DbHelper {
       await client.connect();
       const query = `SELECT * FROM ${this.tableName} WHERE ${columns
         .map((column, index) => `${column} = $${index + 1}`)
-        .join(' AND ')}`;
+        .join(' AND ')} ${additionalWhereQuery}`;
       const res = await client.query(query, values);
       await client.end();
       return res.rows.map((rowObject) => this.mapObjectToCamelCased(rowObject));
