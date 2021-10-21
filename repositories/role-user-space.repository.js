@@ -17,6 +17,16 @@ class RoleUserSpaceRepository extends DbHelper {
 
     return this.findOne(roleUserSpace);
   }
+
+  findBySpaceId(spaceId) {
+    const roleUserSpace = new RoleUserSpace();
+
+    roleUserSpace.spaceId = spaceId;
+    roleUserSpace.deleted = false;
+
+
+    return this.findAll(roleUserSpace);
+  }
 }
 
 module.exports = new RoleUserSpaceRepository();

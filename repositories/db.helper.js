@@ -109,12 +109,10 @@ class DbHelper {
     throw Error('No values to save');
   }
 
-  // eslint-disable-next-line class-methods-use-this
   getPgClient() {
     return new Client({ ssl: { rejectUnauthorized: false } });
   }
 
-  // eslint-disable-next-line class-methods-use-this
   mapObjectToCamelCased(object) {
     const newObject = {};
     Object.keys(object).forEach((key) => {

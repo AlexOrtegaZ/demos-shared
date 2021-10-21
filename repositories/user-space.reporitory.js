@@ -20,6 +20,15 @@ class UserSpaceRepository extends DbHelper {
     const notColumns = ['invitation_status'];
     return this.findOne(userSpace, notColumns);
   }
+
+  findMembers(spaceId) {
+    const userSpace = new UserSpace();
+    userSpace.invitationStatus = invitationStatusEnum.ACCEPTED;
+    userSpace.spaceId = spaceId;
+    userSpace.deleted = false;
+  
+    return this.findAll(userSpace);
+  }
 }
 
 module.exports = new UserSpaceRepository();
