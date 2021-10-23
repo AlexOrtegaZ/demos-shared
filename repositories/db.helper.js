@@ -1,8 +1,9 @@
 const {
   getColumnsAndValues,
-  createPgClient,
+  excuteQuery,
   excuteQueryWithValuesDeprecated,
 } = require('./db.utils');
+const SqlQuery = require('../utils/sqlQuery');
 
 class DbHelper {
   constructor() {

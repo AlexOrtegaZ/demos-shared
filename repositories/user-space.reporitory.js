@@ -28,7 +28,7 @@ class UserSpaceRepository extends DbHelper {
     return result[0];
   }
 
-  async findBySpaceId(spaceId) {
+  async findAllBySpaceId(spaceId) {
     const query = SqlQuery.select.from(this.tableName)
     .where({
       space_id: spaceId,
@@ -37,8 +37,7 @@ class UserSpaceRepository extends DbHelper {
     })
     .build();
 
-    const result = await excuteQuery(query);
-    return result[0];
+    return await excuteQuery(query);
   }
 
   async findAllBySpaceIds(spaceIds) {

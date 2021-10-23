@@ -11,7 +11,7 @@ class RoleUserSpaceRepository extends DbHelper {
     this.colId = 'role_user_space_id';
   }
 
-  async indByUserIdAndSpaceId(userId, spaceId) {
+  async findByUserIdAndSpaceId(userId, spaceId) {
     const query = SqlQuery.select.from(this.tableName)
     .where({
       user_id: userId,
