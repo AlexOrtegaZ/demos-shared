@@ -1,5 +1,7 @@
 const DbHelper = require('./db.helper');
 const Cache = require('../models/cache.model');
+const SqlQuery = require('../utils/sqlQuery');
+const { excuteQuery } = require('./db.utils');
 
 class CacheRepository extends DbHelper {
   constructor() {
@@ -9,13 +11,16 @@ class CacheRepository extends DbHelper {
     this.colId = 'cache_id';
   }
 
-  findAllByUserIdAfterDate(userId, lastUpdatedDate) {
-    const cache = new Cache();
-    cache.userId = userId;
-    const dateQuery = lastUpdatedDate ? `AND created_at > '${lastUpdatedDate}'` : ''
-    const additionalWhereQuery = `${dateQuery} ORDER BY created_at ASC`;
+  async findAllByUserIdAfterDate(userId, lastUpdatedDate) {
+    const query = SqlQuery.select.from(this.tableName)
+    .where({
+      user_id: userId,
+      created_at: SqlQuery.sql.gt(lastUpdatedDate)
+    })
+    .order('created_at', 'A')
+    .build();
 
-    return this.findAll(cache, additionalWhereQuery);
+    return await excuteQuery(query);
   }
 }
 

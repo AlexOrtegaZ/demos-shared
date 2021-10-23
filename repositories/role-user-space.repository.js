@@ -1,5 +1,7 @@
 const DbHelper = require('./db.helper');
 const RoleUserSpace = require('../models/role-user-space.model');
+const SqlQuery = require('../utils/sqlQuery');
+const { excuteQuery } = require('./db.utils');
 
 class RoleUserSpaceRepository extends DbHelper {
   constructor() {
@@ -9,23 +11,42 @@ class RoleUserSpaceRepository extends DbHelper {
     this.colId = 'role_user_space_id';
   }
 
-  findByUserIdAndSpaceId(userId, spaceId) {
-    const roleUserSpace = new RoleUserSpace();
+  async indByUserIdAndSpaceId(userId, spaceId) {
+    const query = SqlQuery.select.from(this.tableName)
+    .where({
+      user_id: userId,
+      space_id: spaceId,
+      deleted: false,
+    })
+    .limit(1)
+    .build();
 
-    roleUserSpace.userId = userId;
-    roleUserSpace.spaceId = spaceId;
-
-    return this.findOne(roleUserSpace);
+    const result = await excuteQuery(query);
+    return result[0];
   }
 
-  findBySpaceId(spaceId) {
-    const roleUserSpace = new RoleUserSpace();
+  async findBySpaceId(spaceId) {
+    const query = SqlQuery.select.from(this.tableName)
+    .where({
+      space_id: spaceId,
+      deleted: false,
+    })
+    .build();
 
-    roleUserSpace.spaceId = spaceId;
-    roleUserSpace.deleted = false;
+    const result = await excuteQuery(query);
+    return result;
+  }
 
+  async findAllBySpaceIds(spaceIds) {
 
-    return this.findAll(roleUserSpace);
+    const query = SqlQuery.select.from(this.tableName)
+    .where({
+      space_id: spaceIds,
+      deleted: false,
+    })
+    .build();
+
+    return await excuteQuery(query);
   }
 }
 

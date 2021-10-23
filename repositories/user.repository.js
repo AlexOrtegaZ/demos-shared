@@ -29,6 +29,13 @@ class UserRepository extends DbHelper {
     const result = await excuteQuery(query);
     return result[0];
   }
+
+  async findAllByIds(userIds) {
+    const query = SqlQuery.select.from(this.tableName)
+    .where({ user_id: userIds })
+    .build();
+    return await excuteQuery(query);
+  }
 }
 
 module.exports = new UserRepository();

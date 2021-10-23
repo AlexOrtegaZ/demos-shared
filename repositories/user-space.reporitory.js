@@ -12,7 +12,7 @@ class UserSpaceRepository extends DbHelper {
     this.colId = 'user_space_id';
   }
 
-  findByUserIdAndSpaceId(userId, spaceId) {
+  async findByUserIdAndSpaceId(userId, spaceId) {
     const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED];
 
     const query = SqlQuery.select.from(this.tableName)
@@ -24,11 +24,11 @@ class UserSpaceRepository extends DbHelper {
     })
     .build();
 
-    const result = await excuteQuery(query)
+    const result = await excuteQuery(query);
     return result[0];
   }
 
-  findBySpaceId(spaceId) {
+  async findBySpaceId(spaceId) {
     const query = SqlQuery.select.from(this.tableName)
     .where({
       space_id: spaceId,
@@ -37,8 +37,22 @@ class UserSpaceRepository extends DbHelper {
     })
     .build();
 
-    const result = await excuteQuery(query)
+    const result = await excuteQuery(query);
     return result[0];
+  }
+
+  async findAllBySpaceIds(spaceIds) {
+    const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED];
+
+    const query = SqlQuery.select.from(this.tableName)
+    .where({
+      space_id: spaceIds,
+      deleted: false,
+      invitation_status: SqlQuery.sql.not_in(invitationStatusToIgnore),
+    })
+    .build();
+
+    return await excuteQuery(query);
   }
 }
 

@@ -10,35 +10,15 @@ class DbHelper {
     this.tableName = '';
     this.colId = '';
   }
-  // TODO: Update this methods (for rule they can not spect a dynamic object, theyHave to by static)
-  async findOne(object, notColumns = []) {
-    this._validateObject(object);
-    const [columns, values] = getColumnsAndValues(object);
-    if (columns.length > 0) {
-      const whereQuery = columns
-        .map((column, index) => `${column} ${notColumns.some((x) => x === column) ? '!' : ''}= $${index + 1}`)
-        .join(' AND ');
-      const query = `SELECT * FROM ${this.tableName} WHERE ${whereQuery} LIMIT 1`;
-      const result = await excuteQueryWithValuesDeprecated(query, values);
-      return result[0];
-    }
-    throw Error('No values to save');
-  }
 
-  // TODO: Update this methods (for rule they can not spect a dynamic object, theyHave to by static)
-  async findAll(object, additionalWhereQuery = '') {
-    this._validateObject(object);
-    const [columns, values] = getColumnsAndValues(object);
-    if (columns.length > 0) {
-      const client = createPgClient();
-      await client.connect();
-      const query = `SELECT * FROM ${this.tableName} WHERE ${columns
-        .map((column, index) => `${column} = $${index + 1}`)
-        .join(' AND ')} ${additionalWhereQuery}`;
-      const result = await excuteQueryWithValuesDeprecated(query, values);
-      return result[0];
-    }
-    throw Error('No values to save');
+  async findById(id) {
+    const query = SqlQuery.select.from(this.tableName)
+    .where({ [this.colId]: id })
+    .limit(1)
+    .build();
+  
+    const result = await excuteQuery(query);
+    return result[0];
   }
 
   // TODO: Update this methods (for rule they can not spect a dynamic object, theyHave to by static)
