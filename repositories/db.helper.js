@@ -44,7 +44,7 @@ class DbHelper {
     const [columns, values] = getColumnsAndValues(object);
     if (columns.length > 0) {
       const query = `UPDATE ${this.tableName} 
-        SET ${columns.map((column, index) => `${column} = $${index + 1}`).join(' ')}
+        SET ${columns.map((column, index) => `${column} = $${index + 1}`).join(', ')}
         WHERE ${this.colId} = '${id}' RETURNING *`;
       const result = await excuteQueryWithValuesDeprecated(query, values);
       return result[0];

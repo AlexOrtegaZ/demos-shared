@@ -13,7 +13,7 @@ class UserRepository extends DbHelper {
 
   async findOneByPhoneNumber(phoneNumber) {
     const query = SqlQuery.select.from(this.tableName)
-    .where({ phone_number: SqlQuery.sql.like(`%${phoneNumber}`) })
+    .where({ phone_number: SqlQuery.sql.like(`%${this._getPhoneWithoutExtension(phoneNumber)}`) })
     .limit(1)
     .build();
 
@@ -36,6 +36,11 @@ class UserRepository extends DbHelper {
     .build();
     return await excuteQuery(query);
   }
+
+  _getPhoneWithoutExtension(phoneNumber) {
+    return phoneNumber.substr(phoneNumber.length - 10);
+  }
+
 }
 
 module.exports = new UserRepository();
