@@ -1,6 +1,8 @@
 const DbHelper = require('./db.helper');
 const UserSpace = require('../models/user-space.model');
 const { invitationStatusEnum } = require('../enums');
+const SqlQuery = require('../utils/sqlQuery');
+const { excuteQuery } = require('./db.utils');
 
 class UserSpaceRepository extends DbHelper {
   constructor() {
@@ -11,23 +13,32 @@ class UserSpaceRepository extends DbHelper {
   }
 
   findByUserIdAndSpaceId(userId, spaceId) {
-    const userSpace = new UserSpace();
+    const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED];
 
-    userSpace.userId = userId;
-    userSpace.spaceId = spaceId;
-    userSpace.deleted = false;
-    userSpace.invitationStatus = invitationStatusEnum.CANCELED;
-    const notColumns = ['invitation_status'];
-    return this.findOne(userSpace, notColumns);
+    const query = SqlQuery.select.from(this.tableName)
+    .where({ 
+      user_id: userId, 
+      space_id: spaceId,
+      deleted: false,
+      invitation_status: SqlQuery.sql.not_in(invitationStatusToIgnore)
+    })
+    .build();
+
+    const result = await excuteQuery(query)
+    return result[0];
   }
 
-  findMembers(spaceId) {
-    const userSpace = new UserSpace();
-    userSpace.invitationStatus = invitationStatusEnum.ACCEPTED;
-    userSpace.spaceId = spaceId;
-    userSpace.deleted = false;
-  
-    return this.findAll(userSpace);
+  findBySpaceId(spaceId) {
+    const query = SqlQuery.select.from(this.tableName)
+    .where({
+      space_id: spaceId,
+      deleted: false,
+      invitation_status: invitationStatusEnum.ACCEPTED,
+    })
+    .build();
+
+    const result = await excuteQuery(query)
+    return result[0];
   }
 }
 

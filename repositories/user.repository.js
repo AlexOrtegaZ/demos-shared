@@ -1,5 +1,7 @@
 const DbHelper = require('./db.helper');
 const User = require('../models/user.model');
+const SqlQuery = require('../utils/sqlQuery');
+const { excuteQuery } = require('./db.utils');
 
 class UserRepository extends DbHelper {
   constructor() {
@@ -10,20 +12,22 @@ class UserRepository extends DbHelper {
   }
 
   async findOneByPhoneNumber(phoneNumber) {
-    const client = this.getPgClient();
-    await client.connect();
-    const query = `SELECT * FROM ${this.tableName} WHERE phone_number LIKE $1 LIMIT 1`;
-    const res = await client.query(query, [`%${phoneNumber}`]);
-    await client.end();
-    const rowObject = res.rows[0];
-    return rowObject ? this.mapObjectToCamelCased(rowObject) : null;
+    const query = SqlQuery.select.from(this.tableName)
+    .where({ phone_number: SqlQuery.sql.like(`%${phoneNumber}`) })
+    .limit(1)
+    .build();
+
+    const result = await excuteQuery(query);
+    return result[0];
   }
 
-  findOneByCognitoId(cognitoId) {
-    const user = new User();
-    user.cognitoId = cognitoId;
-
-    return this.findOne(user);
+  async findOneByCognitoId(cognitoId) {
+    const query = SqlQuery.select.from(this.tableName)
+    .where({ cognito_id: cognitoId })
+    .limit(1)
+    .build();
+    const result = await excuteQuery(query);
+    return result[0];
   }
 }
 
