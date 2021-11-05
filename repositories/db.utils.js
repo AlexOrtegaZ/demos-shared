@@ -1,5 +1,9 @@
 const { Client } = require('pg');
 
+function createPgClient() {
+  return new Client({ ssl: { rejectUnauthorized: false } });
+}
+
 function convertPropNameToColumnNotation(fieldName) {
   return fieldName
     .replace(/\.?([A-Z])/g, function (x, y) {
@@ -59,9 +63,6 @@ async function excuteQuery(query) {
   await client.end();
   return res.rows.map((rowObject) => mapObjectToCamelCased(rowObject));
 }
-function createPgClient() {
-  return new Client({ ssl: { rejectUnauthorized: false } });
-}
 
 module.exports = {
   convertPropNameToColumnNotation,
@@ -70,5 +71,5 @@ module.exports = {
   mapObjectToCamelCased,
   createPgClient,
   excuteQueryWithValuesDeprecated,
-  excuteQuery
+  excuteQuery,
 };

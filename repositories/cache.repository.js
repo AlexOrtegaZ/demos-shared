@@ -12,15 +12,17 @@ class CacheRepository extends DbHelper {
   }
 
   async findAllByUserIdAfterDate(userId, lastUpdatedDate) {
-    const query = SqlQuery.select.from(this.tableName)
-    .where({
-      user_id: userId,
-      created_at: SqlQuery.sql.gt(lastUpdatedDate)
-    })
-    .order('created_at', 'A')
-    .build();
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        user_id: userId,
+        created_at: SqlQuery.sql.gt(lastUpdatedDate),
+      })
+      .order('created_at', 'A')
+      .build();
 
-    return await excuteQuery(query);
+    const result = await excuteQuery(query);
+    return result;
   }
 }
 

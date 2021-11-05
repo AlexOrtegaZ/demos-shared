@@ -3,7 +3,7 @@ const invitationStatusEnum = {
   RECEIVED: 1,
   ACCEPTED: 2,
   CANCELED: 3,
-  REJECTED: 4
+  REJECTED: 4,
 };
 
 module.exports = invitationStatusEnum;

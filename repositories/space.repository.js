@@ -13,14 +13,24 @@ class SpaceRepository extends DbHelper {
   }
 
   async findAllByUserId(userId) {
-    const spaceColumnNames = Object.keys(new Space()).map(key => convertPropNameToColumnNotation(key));
+    const spaceColumnNames = Object.keys(new Space()).map((key) => convertPropNameToColumnNotation(key));
 
-    const query = SqlQuery.select.from(this.tableName)
-    .select(spaceColumnNames)
-    .from(UserSpaceRepository.tableName, this.colId, this.tableName, this.colId)
-    .where({ user_id: userId })
-    .order('t1.created_at', 'A')
-    .build();
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .select(spaceColumnNames)
+      .from(UserSpaceRepository.tableName, this.colId, this.tableName, this.colId)
+      .where({ user_id: userId })
+      .order('t1.created_at', 'A')
+      .build();
+    return excuteQuery(query);
+  }
+
+  async updateNameAndDescriptionAndPercentages(spaceId, name, description, approvalPercentage, participationPercentage) {
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({ name, description, approval_percentage: approvalPercentage, participation_percentage: participationPercentage })
+      .where({ space_id: spaceId })
+      .build();
     return excuteQuery(query);
   }
 }

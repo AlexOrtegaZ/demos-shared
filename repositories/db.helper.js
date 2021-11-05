@@ -1,8 +1,4 @@
-const {
-  getColumnsAndValues,
-  excuteQuery,
-  excuteQueryWithValuesDeprecated,
-} = require('./db.utils');
+const { getColumnsAndValues, excuteQuery, excuteQueryWithValuesDeprecated } = require('./db.utils');
 const SqlQuery = require('../utils/sqlQuery');
 
 class DbHelper {
@@ -13,11 +9,12 @@ class DbHelper {
   }
 
   async findById(id) {
-    const query = SqlQuery.select.from(this.tableName)
-    .where({ [this.colId]: id })
-    .limit(1)
-    .build();
-  
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({ [this.colId]: id })
+      .limit(1)
+      .build();
+
     const result = await excuteQuery(query);
     return result[0];
   }

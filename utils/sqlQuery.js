@@ -1,27 +1,26 @@
 const sql = require('sql-query');
 
 class SqlQuery {
-    
-    constructor() {
-        this.sql = sql;
-        this.query = sql.Query();
-    }
- 
-    get select() {
-        return this.query.select();
-    }
+  constructor() {
+    this.sql = sql;
+    this.query = sql.Query();
+  }
 
-    get create() {
-        return this.query.create();
-    }
+  get select() {
+    return this.query.select();
+  }
 
-    get insert() {
-        return this.query.insert()
-    }
+  get create() {
+    return this.query.create();
+  }
 
-    get update() {
-        return this.query.update()
-    }
+  get insert() {
+    return this.query.insert();
+  }
+
+  get update() {
+    return this.query.update();
+  }
 }
 
 module.exports = new SqlQuery();

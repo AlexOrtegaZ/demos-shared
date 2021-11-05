@@ -12,35 +12,32 @@ class UserRepository extends DbHelper {
   }
 
   async findOneByPhoneNumber(phoneNumber) {
-    const query = SqlQuery.select.from(this.tableName)
-    .where({ phone_number: SqlQuery.sql.like(`%${this._getPhoneWithoutExtension(phoneNumber)}`) })
-    .limit(1)
-    .build();
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({ phone_number: SqlQuery.sql.like(`%${this._getPhoneWithoutExtension(phoneNumber)}`) })
+      .limit(1)
+      .build();
 
     const result = await excuteQuery(query);
     return result[0];
   }
 
   async findOneByCognitoId(cognitoId) {
-    const query = SqlQuery.select.from(this.tableName)
-    .where({ cognito_id: cognitoId })
-    .limit(1)
-    .build();
+    const query = SqlQuery.select.from(this.tableName).where({ cognito_id: cognitoId }).limit(1).build();
     const result = await excuteQuery(query);
     return result[0];
   }
 
   async findAllByIds(userIds) {
-    const query = SqlQuery.select.from(this.tableName)
-    .where({ user_id: userIds })
-    .build();
-    return await excuteQuery(query);
+    const query = SqlQuery.select.from(this.tableName).where({ user_id: userIds }).build();
+
+    const result = await excuteQuery(query);
+    return result;
   }
 
   _getPhoneWithoutExtension(phoneNumber) {
     return phoneNumber.substr(phoneNumber.length - 10);
   }
-
 }
 
 module.exports = new UserRepository();

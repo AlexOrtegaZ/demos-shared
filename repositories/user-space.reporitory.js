@@ -15,43 +15,62 @@ class UserSpaceRepository extends DbHelper {
   async findByUserIdAndSpaceId(userId, spaceId) {
     const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED];
 
-    const query = SqlQuery.select.from(this.tableName)
-    .where({ 
-      user_id: userId, 
-      space_id: spaceId,
-      deleted: false,
-      invitation_status: SqlQuery.sql.not_in(invitationStatusToIgnore)
-    })
-    .build();
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        user_id: userId,
+        space_id: spaceId,
+        deleted: false,
+        invitation_status: SqlQuery.sql.not_in(invitationStatusToIgnore),
+      })
+      .build();
 
     const result = await excuteQuery(query);
     return result[0];
   }
 
-  async findAllBySpaceId(spaceId) {
-    const query = SqlQuery.select.from(this.tableName)
-    .where({
-      space_id: spaceId,
-      deleted: false,
-      invitation_status: invitationStatusEnum.ACCEPTED,
-    })
-    .build();
+  async findUsersBySpaceId(spaceId) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        space_id: spaceId,
+        deleted: false,
+        invitation_status: [invitationStatusEnum.ACCEPTED, invitationStatusEnum.RECEIVED],
+      })
+      .build();
 
-    return await excuteQuery(query);
+    const result = await excuteQuery(query);
+    return result;
+  }
+
+  async findMembers(spaceId) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        space_id: spaceId,
+        deleted: false,
+        invitation_status: invitationStatusEnum.ACCEPTED,
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
   }
 
   async findAllBySpaceIds(spaceIds) {
     const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED];
 
-    const query = SqlQuery.select.from(this.tableName)
-    .where({
-      space_id: spaceIds,
-      deleted: false,
-      invitation_status: SqlQuery.sql.not_in(invitationStatusToIgnore),
-    })
-    .build();
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        space_id: spaceIds,
+        deleted: false,
+        invitation_status: SqlQuery.sql.not_in(invitationStatusToIgnore),
+      })
+      .build();
 
-    return await excuteQuery(query);
+    const result = await excuteQuery(query);
+    return result;
   }
 }
 
