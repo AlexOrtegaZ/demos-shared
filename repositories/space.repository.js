@@ -1,6 +1,6 @@
 const DbHelper = require('./db.helper');
 const Space = require('../models/space.model');
-const UserSpaceRepository = require('./user-space.reporitory');
+const MemberRepository = require('./member.repository');
 const SqlQuery = require('../utils/sqlQuery');
 const { excuteQuery, convertPropNameToColumnNotation } = require('./db.utils');
 
@@ -18,7 +18,7 @@ class SpaceRepository extends DbHelper {
     const query = SqlQuery.select
       .from(this.tableName)
       .select(spaceColumnNames)
-      .from(UserSpaceRepository.tableName, this.colId, this.tableName, this.colId)
+      .from(MemberRepository.tableName, this.colId, this.tableName, this.colId)
       .where({ user_id: userId })
       .order('t1.created_at', 'A')
       .build();

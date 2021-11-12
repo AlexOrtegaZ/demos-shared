@@ -1,15 +1,15 @@
 const DbHelper = require('./db.helper');
-const UserSpace = require('../models/user-space.model');
+const Member = require('../models/member.model');
 const { invitationStatusEnum } = require('../enums');
 const SqlQuery = require('../utils/sqlQuery');
 const { excuteQuery } = require('./db.utils');
 
-class UserSpaceRepository extends DbHelper {
+class MemberRepository extends DbHelper {
   constructor() {
     super();
-    this.entityName = UserSpace.name;
-    this.tableName = 'user_space';
-    this.colId = 'user_space_id';
+    this.entityName = Member.name;
+    this.tableName = 'members';
+    this.colId = 'member_id';
   }
 
   async findByUserIdAndSpaceId(userId, spaceId) {
@@ -29,7 +29,7 @@ class UserSpaceRepository extends DbHelper {
     return result[0];
   }
 
-  async findUsersBySpaceId(spaceId) {
+  async findUsersSpaceIdAndInvitationStatusAcceptedOrReceived(spaceId) {
     const query = SqlQuery.select
       .from(this.tableName)
       .where({
@@ -43,7 +43,7 @@ class UserSpaceRepository extends DbHelper {
     return result;
   }
 
-  async findMembers(spaceId) {
+  async findBySpaceIdAndInvitationStatusAccepted(spaceId) {
     const query = SqlQuery.select
       .from(this.tableName)
       .where({
@@ -72,6 +72,17 @@ class UserSpaceRepository extends DbHelper {
     const result = await excuteQuery(query);
     return result;
   }
+
+  createMember(spaceId, userId, invitationStatus, role, createdBy) {
+    const member = new Member();
+    member.spaceId = spaceId;
+    member.userId = userId;
+    member.invitationStatus = invitationStatus;
+    member.role = role;
+    member.createdBy = createdBy;
+    member.updatedBy = createdBy;
+    return this.create(member);
+  };
 }
 
-module.exports = new UserSpaceRepository();
+module.exports = new MemberRepository();
