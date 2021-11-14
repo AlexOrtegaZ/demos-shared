@@ -24,6 +24,15 @@ class CacheRepository extends DbHelper {
     const result = await excuteQuery(query);
     return result;
   }
+
+  createCache(entityName, eventName, userId, data) {
+    const cache = new Cache();
+    cache.entityName = entityName;
+    cache.eventName = eventName;
+    cache.userId = userId;
+    cache.data = JSON.stringify(data);
+    return CacheRepository.create(cache);
+  }
 }
 
 module.exports = new CacheRepository();

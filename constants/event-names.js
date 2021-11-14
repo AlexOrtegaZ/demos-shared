@@ -1,5 +1,7 @@
 const eventNames = {
-  updated: 'updated',
+  NEW: 'new',
+  UPDATED: 'updated',
+  INVITATION: 'invitation',
 };
 
 module.exports = eventNames;

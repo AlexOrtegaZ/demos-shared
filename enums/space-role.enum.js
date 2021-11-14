@@ -1,7 +1,7 @@
 const spaceRoleEnum = {
   ADMIN: 'ADMIN',
   REPRESENTATIVE: 'REPRESENTATIVE',
-  WORKER: 'WORKER'
+  WORKER: 'WORKER',
 };
 
 module.exports = spaceRoleEnum;

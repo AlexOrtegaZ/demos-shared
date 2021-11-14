@@ -81,8 +81,28 @@ class MemberRepository extends DbHelper {
     member.role = role;
     member.createdBy = createdBy;
     member.updatedBy = createdBy;
+    if (invitationStatus === invitationStatusEnum.SENDED) {
+      const today = new Date();
+      const expiredDate = new Date();
+      expiredDate.setDate(today.getDate() + 7);
+      member.expiredAt = expiredDate.toISOString();
+    }
     return this.create(member);
-  };
+  }
+
+  async update(memberId, name, role, updatedBy) {
+    const query = SqlQuery.update.into(this.tableName).set({ name, role, updatedBy }).where({ member_id: memberId }).build();
+    return excuteQuery(query);
+  }
+
+  async updateInvitationStatus(memberId, invitationStatus) {
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({ invitation_status: invitationStatus })
+      .where({ member_id: memberId })
+      .build();
+    return excuteQuery(query);
+  }
 }
 
 module.exports = new MemberRepository();

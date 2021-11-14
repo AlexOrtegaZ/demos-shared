@@ -33,6 +33,21 @@ class SpaceRepository extends DbHelper {
       .build();
     return excuteQuery(query);
   }
+
+  async updatePictureKey(spaceId, pictureKey) {
+    const query = SqlQuery.update.into(this.tableName).set({ picture_key: pictureKey }).where({ space_id: spaceId }).build();
+    return excuteQuery(query);
+  }
+
+  createSpace(newSpace, currentUser) {
+    const space = new Space();
+    space.name = newSpace.name;
+    space.description = newSpace.description;
+    space.approvalPercentage = newSpace.approvalPercentage;
+    space.participationPercentage = newSpace.participationPercentage;
+    space.ownerId = currentUser.userId;
+    return this.create(space);
+  }
 }
 
 module.exports = new SpaceRepository();

@@ -1,11 +1,19 @@
 const passport = require('passport');
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
+const UserRepository = require('../repositories/user.repository');
 
-const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
-  if (err || info || !user) {
+const verifyCallback = (req, resolve, reject) => async (err, tokenUser, info) => {
+  if (err || info || !tokenUser) {
     return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
   }
+  const cognitoId = tokenUser.username;
+  const user = await UserRepository.findOneByCognitoId(cognitoId);
+
+  if (!user) {
+    return reject(new ApiError(httpStatus.UNAUTHORIZED, 'User not found'));
+  }
+
   req.user = user;
 
   resolve();
