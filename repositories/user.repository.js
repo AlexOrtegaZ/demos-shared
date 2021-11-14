@@ -38,6 +38,20 @@ class UserRepository extends DbHelper {
   _getPhoneWithoutExtension(phoneNumber) {
     return phoneNumber.substr(phoneNumber.length - 10);
   }
+
+  async updateName(userId, name) {
+    const query = SqlQuery.update.into(this.tableName).set({ name }).where({ user_id: userId }).build();
+    return excuteQuery(query);
+  }
+
+  async updatePictureKey(userId, pictureKey) {
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({ profile_picture_key: pictureKey })
+      .where({ user_id: userId })
+      .build();
+    return excuteQuery(query);
+  }
 }
 
 module.exports = new UserRepository();

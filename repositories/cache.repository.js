@@ -31,7 +31,7 @@ class CacheRepository extends DbHelper {
     cache.eventName = eventName;
     cache.userId = userId;
     cache.data = JSON.stringify(data);
-    return CacheRepository.create(cache);
+    return this.create(cache);
   }
 }
 
