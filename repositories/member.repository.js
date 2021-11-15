@@ -91,7 +91,11 @@ class MemberRepository extends DbHelper {
   }
 
   async update(memberId, name, role, updatedBy) {
-    const query = SqlQuery.update.into(this.tableName).set({ name, role, updatedBy }).where({ member_id: memberId }).build();
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({ name, role, updated_by: updatedBy })
+      .where({ member_id: memberId })
+      .build();
     return excuteQuery(query);
   }
 
