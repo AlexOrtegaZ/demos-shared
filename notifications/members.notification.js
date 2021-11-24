@@ -1,5 +1,5 @@
 const { MEMBERS } = require('../constants/entity-names');
-const { UPDATE, NEW, INVITATION } = require('../constants/event-names');
+const { UPDATED, INVITATION } = require('../constants/event-names');
 const MemberRepository = require('../repositories/member.repository');
 const CacheRepository = require('../repositories/cache.repository');
 const cacheService = require('../services/cache.service');
@@ -20,15 +20,8 @@ const notifyEachActiveMemberOn = async (generateCache, spaceId) => {
 
 const memberUpdated = (spaceId, memberId) => {
   notifyEachActiveMemberOn(async (member) => {
-    const data = { memberId };
-    await createMemberCache(UPDATE, member.userId, data);
-  }, spaceId);
-};
-
-const newMember = (spaceId, memberId) => {
-  notifyEachActiveMemberOn(async (member) => {
-    const data = { memberId };
-    await createMemberCache(NEW, member.userId, data);
+    const data = { memberId, spaceId };
+    await createMemberCache(UPDATED, member.userId, data);
   }, spaceId);
 };
 
@@ -41,6 +34,5 @@ const newInvitation = async (spaceId, userId) => {
 module.exports = {
   notifyEachActiveMemberOn,
   memberUpdated,
-  newMember,
   newInvitation,
 };
