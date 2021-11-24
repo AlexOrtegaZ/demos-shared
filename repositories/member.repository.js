@@ -10,6 +10,7 @@ class MemberRepository extends DbHelper {
     this.entityName = Member.name;
     this.tableName = 'members';
     this.colId = 'member_id';
+    this.hasDeletedColumn = true;
   }
 
   async findByUserIdAndSpaceId(userId, spaceId) {
@@ -99,10 +100,19 @@ class MemberRepository extends DbHelper {
     return excuteQuery(query);
   }
 
-  async updateInvitationStatus(memberId, invitationStatus) {
+  async updateInvitationStatus(memberId, invitationStatus, updatedBy) {
     const query = SqlQuery.update
       .into(this.tableName)
-      .set({ invitation_status: invitationStatus })
+      .set({ invitation_status: invitationStatus, updated_by: updatedBy })
+      .where({ member_id: memberId })
+      .build();
+    return excuteQuery(query);
+  }
+
+  async delete(memberId, updatedBy) {
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({ deleted: true, updated_by: updatedBy })
       .where({ member_id: memberId })
       .build();
     return excuteQuery(query);

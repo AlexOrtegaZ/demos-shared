@@ -31,8 +31,22 @@ const newInvitation = async (spaceId, userId) => {
   cacheService.emitUpdateCache(userId);
 };
 
+const invitationCanceled = async (spaceId, userId, memberId) => {
+  const data = { memberId, spaceId };
+  await createMemberCache('invitation:canceled', userId, data);
+  cacheService.emitUpdateCache(userId);
+};
+
+const memberDeleted = async (spaceId, userId, memberId) => {
+  const data = { memberId, spaceId };
+  await createMemberCache('deleted', userId, data);
+  cacheService.emitUpdateCache(userId);
+};
+
 module.exports = {
   notifyEachActiveMemberOn,
   memberUpdated,
   newInvitation,
+  invitationCanceled,
+  memberDeleted,
 };
