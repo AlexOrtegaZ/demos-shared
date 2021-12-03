@@ -13,6 +13,17 @@ class MemberRepository extends DbHelper {
     this.hasDeletedColumn = true;
   }
 
+  async findAnyMemberById(memberId) {
+      const query = SqlQuery.select
+        .from(this.tableName)
+        .where({ [this.colId]: memberId })
+        .limit(1)
+        .build();
+  
+      const result = await excuteQuery(query);
+      return result[0];
+  }
+
   async findByUserIdAndSpaceId(userId, spaceId) {
     const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED];
 
