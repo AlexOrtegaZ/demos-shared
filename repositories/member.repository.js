@@ -63,6 +63,7 @@ class MemberRepository extends DbHelper {
         deleted: false,
         invitation_status: invitationStatusEnum.ACCEPTED,
       })
+      .order('created_at', 'A')
       .build();
 
     const result = await excuteQuery(query);
