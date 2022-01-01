@@ -25,7 +25,7 @@ class MemberRepository extends DbHelper {
   }
 
   async findByUserIdAndSpaceId(userId, spaceId) {
-    const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED];
+    const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED, invitationStatusEnum.EXPIRED];
 
     const query = SqlQuery.select
       .from(this.tableName)
