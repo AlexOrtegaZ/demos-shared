@@ -1,4 +1,9 @@
 module.exports.Cache = require('./cache.model');
 module.exports.Space = require('./space.model');
 module.exports.User = require('./user.model');
+module.exports.Manifesto = require('./manifesto.model');
+module.exports.ManifestoOption = require('./manifesto-option.model');
 module.exports.Member = require('./member.model');
+module.exports.Proposal = require('./proposal.model');
+module.exports.ProposalParticipation = require('./proposal-participation.model');
+module.exports.ProposalVote = require('./proposal-vote.model');
