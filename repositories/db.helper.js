@@ -6,12 +6,17 @@ class DbHelper {
     this.entityName = '';
     this.tableName = '';
     this.colId = '';
+    this.hasDeletedColumn = false;
   }
 
   async findById(id) {
+    const whereQueryObject = { [this.colId]: id };
+    if (this.hasDeletedColumn) {
+      whereQueryObject.deleted = false;
+    }
     const query = SqlQuery.select
       .from(this.tableName)
-      .where({ [this.colId]: id })
+      .where(whereQueryObject)
       .limit(1)
       .build();
 

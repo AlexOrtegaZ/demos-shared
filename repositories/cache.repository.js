@@ -16,7 +16,7 @@ class CacheRepository extends DbHelper {
       .from(this.tableName)
       .where({
         user_id: userId,
-        created_at: SqlQuery.sql.gt(lastUpdatedDate),
+        created_at: lastUpdatedDate ? SqlQuery.sql.gt(lastUpdatedDate) : undefined,
       })
       .order('created_at', 'A')
       .build();

@@ -10,10 +10,22 @@ class MemberRepository extends DbHelper {
     this.entityName = Member.name;
     this.tableName = 'members';
     this.colId = 'member_id';
+    this.hasDeletedColumn = true;
+  }
+
+  async findAnyMemberById(memberId) {
+      const query = SqlQuery.select
+        .from(this.tableName)
+        .where({ [this.colId]: memberId })
+        .limit(1)
+        .build();
+  
+      const result = await excuteQuery(query);
+      return result[0];
   }
 
   async findByUserIdAndSpaceId(userId, spaceId) {
-    const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED];
+    const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED, invitationStatusEnum.EXPIRED];
 
     const query = SqlQuery.select
       .from(this.tableName)
@@ -51,6 +63,7 @@ class MemberRepository extends DbHelper {
         deleted: false,
         invitation_status: invitationStatusEnum.ACCEPTED,
       })
+      .order('created_at', 'A')
       .build();
 
     const result = await excuteQuery(query);
@@ -91,14 +104,27 @@ class MemberRepository extends DbHelper {
   }
 
   async update(memberId, name, role, updatedBy) {
-    const query = SqlQuery.update.into(this.tableName).set({ name, role, updatedBy }).where({ member_id: memberId }).build();
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({ name, role, updated_by: updatedBy })
+      .where({ member_id: memberId })
+      .build();
     return excuteQuery(query);
   }
 
-  async updateInvitationStatus(memberId, invitationStatus) {
+  async updateInvitationStatus(memberId, invitationStatus, updatedBy) {
     const query = SqlQuery.update
       .into(this.tableName)
-      .set({ invitation_status: invitationStatus })
+      .set({ invitation_status: invitationStatus, updated_by: updatedBy })
+      .where({ member_id: memberId })
+      .build();
+    return excuteQuery(query);
+  }
+
+  async delete(memberId, updatedBy) {
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({ deleted: true, updated_by: updatedBy })
       .where({ member_id: memberId })
       .build();
     return excuteQuery(query);
