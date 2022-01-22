@@ -4,6 +4,7 @@ class Proposal {
       this.manifestoId = '';
       this.status = '';
       this.progressStatus = '';
+      this.spaceId = '';
       this.expiredAt = '';
       this.createdBy = undefined;
       this.createdAt = undefined;
