@@ -18,6 +18,10 @@ class SqlQuery {
     return this.query.insert();
   }
 
+  get remove() {
+    return this.query.remove();
+  }
+
   get update() {
     return this.query.update();
   }

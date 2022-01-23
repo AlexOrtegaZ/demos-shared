@@ -1,5 +1,7 @@
 const DbHelper = require('./db.helper');
 const Proposal = require('../models/proposal.model');
+const SqlQuery = require('../utils/sqlQuery');
+const { excuteQuery } = require('./db.utils');
 
 class ProposalRepository extends DbHelper {
   constructor() {
@@ -26,6 +28,25 @@ class ProposalRepository extends DbHelper {
     newProposal.updatedBy = userId;
   
     return this.create(newProposal);
+  }
+
+  /**
+   * Update proposal
+   * @param {number} proposalId
+   * @param {number} status
+   * @param {number} userId
+   * @returns {Promise<Proposal>}
+   */
+   async updateProposal(proposalId, status, userId) {
+    const query = SqlQuery.update
+    .into(this.tableName)
+    .set({
+      status,
+      updated_by: userId,
+    })
+    .where({ [this.colId]: proposalId })
+    .build();
+  return excuteQuery(query);
   }
 }
 

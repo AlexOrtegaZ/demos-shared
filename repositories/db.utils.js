@@ -59,7 +59,9 @@ async function excuteQueryWithValuesDeprecated(query, values) {
 async function excuteQuery(query) {
   const client = createPgClient();
   await client.connect();
-  const res = await client.query(query.replaceAll('`', ''));
+  const res = await client.query(
+    query.replaceAll('`', '').replaceAll('\\\'', '\'\'')
+  );
   await client.end();
   return res.rows.map((rowObject) => mapObjectToCamelCased(rowObject));
 }
