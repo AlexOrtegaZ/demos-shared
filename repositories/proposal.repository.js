@@ -19,14 +19,14 @@ class ProposalRepository extends DbHelper {
    * @param {number} userId
    * @returns {Promise<Proposal>}
    */
-   async createProposal(manifestoId, status, spaceId, userId) {
+  async createProposal(manifestoId, status, spaceId, userId) {
     const newProposal = new Proposal();
     newProposal.manifestoId = manifestoId;
     newProposal.status = status;
     newProposal.spaceId = spaceId;
     newProposal.createdBy = userId;
     newProposal.updatedBy = userId;
-  
+
     return this.create(newProposal);
   }
 
@@ -37,16 +37,17 @@ class ProposalRepository extends DbHelper {
    * @param {number} userId
    * @returns {Promise<Proposal>}
    */
-   async updateProposal(proposalId, status, userId) {
+  async updateProposal(proposalId, status, userId) {
     const query = SqlQuery.update
-    .into(this.tableName)
-    .set({
-      status,
-      updated_by: userId,
-    })
-    .where({ [this.colId]: proposalId })
-    .build();
-  return excuteQuery(query);
+      .into(this.tableName)
+      .set({
+        status,
+        updated_by: userId,
+      })
+      .where({ [this.colId]: proposalId })
+      .build();
+    await excuteQuery(query);
+    return this.findById(proposalId);
   }
 }
 
