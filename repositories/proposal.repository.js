@@ -12,6 +12,25 @@ class ProposalRepository extends DbHelper {
   }
 
   /**
+   * Find proposal by spaceId and proposalId
+   * @param {number} spaceId
+   * @param {number} proposalId
+   * @returns {Promise<Proposal>}
+   */
+  async findBySpaceIdAndProposalId(spaceId, proposalId) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        [this.colId]: proposalId,
+        space_id: spaceId,
+      })
+      .limit(1)
+      .build();
+
+    const result = await excuteQuery(query);
+    return result[0];
+  }
+  /**
    * Create proposal
    * @param {number} manifestoId
    * @param {number} status

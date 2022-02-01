@@ -24,7 +24,7 @@ const notifyEachActiveMemberOn = async (generateCache, spaceId) => {
  * @param {number} proposalId
  * @returns {void}>}
  */
-const proposalPublished = (spaceId, proposalId) => {
+const proposalUpdated = (spaceId, proposalId) => {
   notifyEachActiveMemberOn(async (member) => {
     const data = { proposalId, spaceId };
     await createProposalsCache(PUBLISHED, member.userId, data);
@@ -32,5 +32,5 @@ const proposalPublished = (spaceId, proposalId) => {
 };
 
 module.exports = {
-  proposalPublished,
+  proposalUpdated,
 };
