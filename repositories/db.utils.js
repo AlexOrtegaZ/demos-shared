@@ -60,7 +60,7 @@ async function excuteQuery(query) {
   const client = createPgClient();
   await client.connect();
   const res = await client.query(
-    query.replaceAll('`', '').replaceAll('\\\'', '\'\'')
+    query.replaceAll('`', '').replaceAll("\\'", "''").replaceAll('\\"', '"').replaceAll('\\\\n', '\\n')
   );
   await client.end();
   return res.rows.map((rowObject) => mapObjectToCamelCased(rowObject));
