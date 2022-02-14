@@ -26,12 +26,34 @@ class SpaceRepository extends DbHelper {
   }
 
   async updateNameAndDescriptionAndPercentages(spaceId, name, description, approvalPercentage, participationPercentage) {
+    const updateInfo = this._getUpdateInfoObject(name, description, approvalPercentage, participationPercentage);
+
     const query = SqlQuery.update
       .into(this.tableName)
-      .set({ name, description, approval_percentage: approvalPercentage, participation_percentage: participationPercentage })
+      .set(updateInfo)
       .where({ space_id: spaceId })
       .build();
     return excuteQuery(query);
+  }
+
+  _getUpdateInfoObject(name, description, approvalPercentage, participationPercentage) {
+    const updateInfo = {};
+
+    if (!!name) {
+      updateInfo.name = name;
+    }
+    if (description != null) {
+      updateInfo.description = description;
+    }
+
+    if(!!approvalPercentage) {
+      updateInfo['approval_percentage'] = approvalPercentage;
+    }
+
+    if(!!participationPercentage) {
+      updateInfo['participation_percentage'] = participationPercentage;
+    }
+    return updateInfo;
   }
 
   async updatePictureKey(spaceId, pictureKey) {

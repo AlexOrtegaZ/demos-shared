@@ -8,21 +8,23 @@ const createSpaceCache = (eventName, userId, data) => {
   return CacheRepository.createCache(SPACE, eventName, userId, data);
 };
 
-const notifyEachActiveMemberOn = async (generateCache, spaceId) => {
+const notifyEachActiveMemberOn = async (generateCache, spaceId, exceptForUserId) => {
   const members = await MemberRepository.findUsersSpaceIdAndInvitationStatusAcceptedOrReceived(spaceId);
 
   members.forEach(async (member) => {
-    await generateCache(member);
+    if (exceptForUserId != member.userId) {
+      await generateCache(member);
 
-    cacheService.emitUpdateCache(member.userId);
+      cacheService.emitUpdateCache(member.userId);
+    }
   });
 };
 
-const spaceUpdated = (spaceId) => {
+const spaceUpdated = (spaceId, exceptForUserId) => {
   notifyEachActiveMemberOn(async (member) => {
     const data = { spaceId };
     await createSpaceCache(UPDATED, member.userId, data);
-  }, spaceId);
+  }, spaceId, exceptForUserId);
 };
 
 module.exports = {
