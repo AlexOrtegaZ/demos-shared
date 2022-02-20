@@ -4,6 +4,8 @@ class ProposalVote {
       this.proposalId = '';
       this.userHash = '';
       this.manifestoOptionId = '';
+      this.inFavor = undefined;
+      this.nullVoteComment = '';
       this.createdAt = undefined;
       this.updatedAt = undefined;
     }

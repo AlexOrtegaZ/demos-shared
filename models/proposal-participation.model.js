@@ -3,6 +3,7 @@ class ProposalParticipation {
       this.proposalParticipationId = '';
       this.proposalId = '';
       this.userId = '';
+      this.memberId = ''
     }
   }
   

@@ -2,7 +2,7 @@ const { PROPOSALS } = require('../constants/entity-names');
 const cacheService = require('../services/cache.service');
 const CacheRepository = require('../repositories/cache.repository');
 const MemberRepository = require('../repositories/member.repository');
-const { PUBLISHED } = require('../constants/event-names');
+const { PUBLISHED, NEW } = require('../constants/event-names');
 
 const createProposalsCache = (eventName, userId, data) => {
   return CacheRepository.createCache(PROPOSALS, eventName, userId, data);
@@ -20,8 +20,8 @@ const notifyEachActiveMemberOn = async (generateCache, spaceId) => {
 
 /**
  * Notify all members for a new proposal published
- * @param {number} spaceId
- * @param {number} proposalId
+ * @param {string} spaceId
+ * @param {string} proposalId
  * @returns {void}>}
  */
 const proposalUpdated = (spaceId, proposalId) => {
@@ -31,6 +31,20 @@ const proposalUpdated = (spaceId, proposalId) => {
   }, spaceId);
 };
 
+/**
+ * Notify all members for a new proposal participation
+ * @param {string} spaceId
+ * @param {string} proposalParticipationId
+ * @returns {void}>}
+ */
+const proposalVoteCreated = (spaceId, proposalParticipationId) => {
+  notifyEachActiveMemberOn(async (member) => {
+    const data = { proposalParticipationId, spaceId };
+    await createProposalsCache(NEW, member.userId, data);
+  }, spaceId);
+};
+
 module.exports = {
   proposalUpdated,
+  proposalVoteCreated,
 };
