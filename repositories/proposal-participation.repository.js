@@ -27,6 +27,25 @@ class ProposalParticipationRepository extends DbHelper {
     return this.create(participation);
   }
 
+
+  /**
+   * Update proposal participation
+   * @param {number} proposalParticipationId
+   * @param {number} participated
+   * @returns {Promise<Proposal>}
+   */
+   async updateProposalParticipation(proposalParticipationId, participated) {
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({
+        participated,
+      })
+      .where({ [this.colId]: proposalParticipationId })
+      .build();
+    await excuteQuery(query);
+    return this.findById(proposalParticipationId);
+  }
+
   /**
    * Find Proposal Participation by proposalId and userId
    * @param {string} proposalId
@@ -45,6 +64,23 @@ class ProposalParticipationRepository extends DbHelper {
 
     const result = await excuteQuery(query);
     return result[0];
+  }
+
+  /**
+   * Find Proposal Participation by proposalId
+   * @param {string} proposalId
+   * @returns {Promise<ProposalParticipation[]>}
+   */
+  async findByProposalId(proposalId) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        proposal_id: proposalId,
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
   }
 }
 

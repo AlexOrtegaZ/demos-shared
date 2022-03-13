@@ -2,19 +2,21 @@ const { PROPOSALS } = require('../constants/entity-names');
 const cacheService = require('../services/cache.service');
 const CacheRepository = require('../repositories/cache.repository');
 const MemberRepository = require('../repositories/member.repository');
-const { PUBLISHED, NEW } = require('../constants/event-names');
+const { PUBLISHED, UPDATED } = require('../constants/event-names');
 
 const createProposalsCache = (eventName, userId, data) => {
   return CacheRepository.createCache(PROPOSALS, eventName, userId, data);
 };
 
-const notifyEachActiveMemberOn = async (generateCache, spaceId) => {
-  const members = await MemberRepository.findUsersSpaceIdAndInvitationStatusAcceptedOrReceived(spaceId);
+const notifyEachActiveMemberOn = async (generateCache, spaceId, exceptForUserId) => {
+  const members = await MemberRepository.findBySpaceIdAndInvitationStatusAccepted(spaceId);
 
   members.forEach(async (member) => {
-    await generateCache(member);
+    if (exceptForUserId != member.userId) {
+      await generateCache(member);
 
-    cacheService.emitUpdateCache(member.userId);
+      cacheService.emitUpdateCache(member.userId);
+    }
   });
 };
 
@@ -22,29 +24,32 @@ const notifyEachActiveMemberOn = async (generateCache, spaceId) => {
  * Notify all members for a new proposal published
  * @param {string} spaceId
  * @param {string} proposalId
+ * @param {string} exceptForUserId
  * @returns {void}>}
  */
-const proposalUpdated = (spaceId, proposalId) => {
+const proposalUpdated = (spaceId, proposalId, exceptForUserId) => {
   notifyEachActiveMemberOn(async (member) => {
     const data = { proposalId, spaceId };
     await createProposalsCache(PUBLISHED, member.userId, data);
-  }, spaceId);
+  }, spaceId, exceptForUserId);
 };
 
 /**
  * Notify all members for a new proposal participation
  * @param {string} spaceId
+ * @param {string} proposalId
  * @param {string} proposalParticipationId
+ * @param {string} exceptForUserId
  * @returns {void}>}
  */
-const proposalVoteCreated = (spaceId, proposalParticipationId) => {
+const proposalVoteUpdated = (spaceId, proposalId, proposalParticipationId, exceptForUserId) => {
   notifyEachActiveMemberOn(async (member) => {
-    const data = { proposalParticipationId, spaceId };
-    await createProposalsCache(NEW, member.userId, data);
-  }, spaceId);
+    const data = { proposalParticipationId, proposalId, spaceId };
+    await createProposalsCache('voted', member.userId, data);
+  }, spaceId, exceptForUserId);
 };
 
 module.exports = {
   proposalUpdated,
-  proposalVoteCreated,
+  proposalVoteUpdated,
 };
