@@ -18,7 +18,7 @@
 */
 
 const httpStatus = require('http-status');
-const manifestoCommentRepository = require('../shared/repositories/manifesto-comment.repository');
+const manifestoCommentRepository = require('../repositories/manifesto-comment.repository');
 const ApiError = require('../utils/ApiError');
 
 const isSubComment = async (req, res, next) => {
