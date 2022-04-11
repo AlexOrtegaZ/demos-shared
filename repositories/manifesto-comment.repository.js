@@ -23,7 +23,7 @@ const ManifestoComment = require("../models/manifesto-comment.model");
 class ManifestoCommentRepository extends DbHelper {
   constructor() {
     super();
-    this.entityName = Member.name;
+    this.entityName = ManifestoComment.name;
     this.tableName = "manifesto_comment";
     this.colId = "manifesto_comment_id";
   }
