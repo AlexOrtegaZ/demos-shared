@@ -35,13 +35,15 @@ class ProposalParticipationRepository extends DbHelper {
    * @param {string} proposalId
    * @param {string} userId
    * @param {string} memberId
+   * @param {string} spaceId
    * @returns {Promise<ProposalParticipation>}
    */
-  async createProposalParticipation(proposalId, userId, memberId) {
+  async createProposalParticipation(proposalId, userId, memberId, spaceId) {
     const participation = new ProposalParticipation();
     participation.proposalId = proposalId;
     participation.userId = userId;
     participation.memberId = memberId;
+    participation.spaceId = spaceId;
 
     return this.create(participation);
   }

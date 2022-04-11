@@ -23,6 +23,7 @@ class ProposalParticipation {
       this.proposalId = '';
       this.userId = '';
       this.memberId = '';
+      this.spaceId = '';
       this.participated = false;
     }
   }

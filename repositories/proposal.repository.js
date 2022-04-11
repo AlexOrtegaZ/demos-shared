@@ -21,6 +21,7 @@ const DbHelper = require('./db.helper');
 const Proposal = require('../models/proposal.model');
 const SqlQuery = require('../utils/sqlQuery');
 const { excuteQuery } = require('./db.utils');
+const { toIsoString } = require('../utils/date.utils');
 
 class ProposalRepository extends DbHelper {
   constructor() {
@@ -64,6 +65,7 @@ class ProposalRepository extends DbHelper {
     newProposal.spaceId = spaceId;
     newProposal.createdBy = userId;
     newProposal.updatedBy = userId;
+    newProposal.expiredAt = this._getExpirationDateOnIsoString();
 
     return this.create(newProposal);
   }
@@ -76,16 +78,26 @@ class ProposalRepository extends DbHelper {
    * @returns {Promise<Proposal>}
    */
   async updateProposal(proposalId, status, userId) {
+    const expiredAt = this._getExpirationDateOnIsoString();
     const query = SqlQuery.update
       .into(this.tableName)
       .set({
         status,
         updated_by: userId,
+        expired_at: expiredAt,
       })
       .where({ [this.colId]: proposalId })
       .build();
     await excuteQuery(query);
     return this.findById(proposalId);
+  }
+
+  _getExpirationDateOnIsoString() {
+    const dateMilliseconds = new Date().getTime();
+    const millisecondsInAnHour = 1000 * 60 * 60;
+    const expirationDateOnMilliseconds = dateMilliseconds + (millisecondsInAnHour * 3);
+    
+    return toIsoString(new Date(expirationDateOnMilliseconds));
   }
 }
 
