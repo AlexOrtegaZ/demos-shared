@@ -17,11 +17,19 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const entityNames = {
-  MEMBERS: 'members',
-  SPACE: 'space',
-  PROPOSALS: 'proposals',
-  COMMENTS: 'comments',
+const cacheService = require('../../services/cache.service');
+const MemberRepository = require('../../repositories/member.repository');
+
+const notifyEachActiveMemberOn = async (generateCache, spaceId, exceptForUserId) => {
+  const members = await MemberRepository.findBySpaceIdAndInvitationStatusAccepted(spaceId);
+
+  members.forEach(async (member) => {
+    if (exceptForUserId != member.userId) {
+      await generateCache(member);
+
+      cacheService.emitUpdateCache(member.userId);
+    }
+  });
 };
 
-module.exports = entityNames;
+module.exports = notifyEachActiveMemberOn
