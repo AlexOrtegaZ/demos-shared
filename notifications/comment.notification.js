@@ -17,16 +17,22 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const DbHelper = require("./db.helper");
-const ManifestoCommentVote = require("../models/manifesto-comment-vote.model");
+const { COMMENTS } = require('../constants/entity-names');
+const { PUBLISHED } = require('../constants/event-names');
+const CacheRepository = require('../repositories/cache.repository');
+const notifyEachActiveMemberOn = require('./utils/utils');
 
-class ManifestoCommentVoteRepository extends DbHelper {
-  constructor() {
-    super();
-    this.entityName = ManifestoCommentVote.name;
-    this.tableName = "manifesto_comment_vote";
-    this.colId = "manifesto_comment_vote_id";
-  }
-}
+const createCommentCache = (eventName, userId, data) => {
+  return CacheRepository.createCache(COMMENTS, eventName, userId, data);
+};
 
-module.exports = new ManifestoCommentVoteRepository();
+const newComment = async (spaceId, manifestoCommentId, userId) => {
+  notifyEachActiveMemberOn(async (member) => {
+    const data = { spaceId, manifestoCommentId };
+    await createCommentCache(PUBLISHED, member.userId, data);
+  }, spaceId, userId);
+};
+
+module.exports = {
+  newComment
+};

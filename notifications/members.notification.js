@@ -22,19 +22,10 @@ const { UPDATED, INVITATION } = require('../constants/event-names');
 const MemberRepository = require('../repositories/member.repository');
 const CacheRepository = require('../repositories/cache.repository');
 const cacheService = require('../services/cache.service');
+const notifyEachActiveMemberOn = require('./utils/utils');
 
 const createMemberCache = (eventName, userId, data) => {
   return CacheRepository.createCache(MEMBERS, eventName, userId, data);
-};
-
-const notifyEachActiveMemberOn = async (generateCache, spaceId) => {
-  const members = await MemberRepository.findBySpaceIdAndInvitationStatusAccepted(spaceId);
-
-  members.forEach(async (member) => {
-    await generateCache(member);
-
-    cacheService.emitUpdateCache(member.userId);
-  });
 };
 
 const memberUpdated = (spaceId, memberId) => {

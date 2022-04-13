@@ -17,16 +17,23 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const DbHelper = require("./db.helper");
-const ManifestoCommentVote = require("../models/manifesto-comment-vote.model");
+const httpStatus = require('http-status');
+const manifestoCommentRepository = require('../repositories/manifesto-comment.repository');
+const ApiError = require('../utils/ApiError');
 
-class ManifestoCommentVoteRepository extends DbHelper {
-  constructor() {
-    super();
-    this.entityName = ManifestoCommentVote.name;
-    this.tableName = "manifesto_comment_vote";
-    this.colId = "manifesto_comment_vote_id";
+const isSubComment = async (req, res, next) => {
+  const { manifestoCommentParentId } = req.params;
+
+  const manifestoComment = await manifestoCommentRepository.findById(manifestoCommentParentId);
+  if (!manifestoComment) {
+    return next(new ApiError(httpStatus.NOT_FOUND, 'Manifesto comment not found'));
   }
-}
 
-module.exports = new ManifestoCommentVoteRepository();
+  if (manifestoComment.manifestoCommentParentId) {
+    return next(new ApiError(httpStatus.BAD_REQUEST, 'This comment cannot have a sub comment'));
+  }
+
+  return next();
+};
+
+module.exports = isSubComment;
