@@ -29,7 +29,7 @@ const createCommentCache = (eventName, userId, data) => {
 const newComment = async (spaceId, manifestoCommentId, userId) => {
   notifyEachActiveMemberOn(async (member) => {
     const data = { spaceId, manifestoCommentId };
-    createCommentCache(PUBLISHED, member.userId, data);
+    await createCommentCache(PUBLISHED, member.userId, data);
   }, spaceId, userId);
 };
 
