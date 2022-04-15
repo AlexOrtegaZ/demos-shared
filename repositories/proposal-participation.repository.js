@@ -103,6 +103,24 @@ class ProposalParticipationRepository extends DbHelper {
     const result = await excuteQuery(query);
     return result;
   }
+
+  /**
+   * Remove Proposal Participation by proposalId
+   * @param {string} proposalId
+   * @returns {Promise<void>}
+   */
+  async deleteByProposalId(proposalId) {
+    const query = SqlQuery.remove
+      .from(this.tableName)
+      .where({
+        proposal_id: proposalId,
+      })
+      .build();
+
+    await excuteQuery(query);
+  }
+
+
 }
 
 module.exports = new ProposalParticipationRepository();
