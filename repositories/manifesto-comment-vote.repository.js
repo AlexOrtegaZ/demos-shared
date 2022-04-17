@@ -17,15 +17,31 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const DbHelper = require("./db.helper");
-const ManifestoCommentVote = require("../models/manifesto-comment-vote.model");
+const DbHelper = require('./db.helper');
+const ManifestoCommentVote = require('../models/manifesto-comment-vote.model');
 
 class ManifestoCommentVoteRepository extends DbHelper {
   constructor() {
     super();
     this.entityName = ManifestoCommentVote.name;
-    this.tableName = "manifesto_comment_vote";
-    this.colId = "manifesto_comment_vote_id";
+    this.tableName = 'manifesto_comment_vote';
+    this.colId = 'manifesto_comment_vote_id';
+  }
+
+  /**
+   * Create manifesto comment
+   * @param {string} manifestoCommentId
+   * @param {boolean} upvote
+   * @param {string} userId
+   * @returns {Promise<ManifestoCommentVote>}
+   */
+  async createManifestoCommentVote(manifestoCommentId, upvote, userId) {
+    const newCommentVote = new ManifestoCommentVote();
+    newCommentVote.manifestoCommentId = manifestoCommentId;
+    newCommentVote.upvote = upvote;
+    newCommentVote.userId = userId;
+
+    return this.create(newCommentVote);
   }
 }
 
