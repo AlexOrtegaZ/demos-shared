@@ -19,6 +19,8 @@
 
 const DbHelper = require('./db.helper');
 const ManifestoCommentVote = require('../models/manifesto-comment-vote.model');
+const SqlQuery = require('../utils/sqlQuery');
+const { excuteQuery } = require('./db.utils');
 
 class ManifestoCommentVoteRepository extends DbHelper {
   constructor() {
@@ -42,6 +44,25 @@ class ManifestoCommentVoteRepository extends DbHelper {
     newCommentVote.userId = userId;
 
     return this.create(newCommentVote);
+  }
+
+  /**
+   * Create and publish a proposal
+   * @param {string} manifestoCommentVoteId
+   * @param {boolean} upvote
+   * @returns {Promise<ManifestoCommentVote>}
+   */
+  async updateCommentVote(manifestoCommentVoteId, upvote) {
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({
+        upvote,
+      })
+      .where({ [this.colId]: manifestoCommentVoteId })
+      .build();
+
+    await excuteQuery(query);
+    return this.findById(manifestoCommentVoteId);
   }
 }
 
