@@ -81,6 +81,20 @@ class ManifestoCommentVoteRepository extends DbHelper {
     await excuteQuery(query);
     return this.findById(manifestoCommentVoteId);
   }
+
+  /**
+   * Create and publish a proposal
+   * @param {string} manifestoCommentVoteId
+   * @returns {Promise<void>}
+   */
+  async deleteCommentVote(manifestoCommentVoteId) {
+    const query = SqlQuery.remove
+      .from(this.tableName)
+      .where({ [this.colId]: manifestoCommentVoteId })
+      .build();
+
+    await excuteQuery(query);
+  }
 }
 
 module.exports = new ManifestoCommentVoteRepository();
