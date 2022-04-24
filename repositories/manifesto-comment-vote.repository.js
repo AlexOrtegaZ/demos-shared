@@ -33,6 +33,23 @@ class ManifestoCommentVoteRepository extends DbHelper {
   /**
    * Create manifesto comment
    * @param {string} manifestoCommentId
+   * @param {string} userId
+   * @returns {Promise<ManifestoCommentVote>}
+   */
+  async findByManifestoCommentIdAndUserId(manifestoCommentId, userId) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({ manifesto_comment_id: manifestoCommentId, user_id: userId })
+      .limit(1)
+      .build();
+
+    const result = await excuteQuery(query);
+    return result[0];
+  }
+
+  /**
+   * Create manifesto comment
+   * @param {string} manifestoCommentId
    * @param {boolean} upvote
    * @param {string} userId
    * @returns {Promise<ManifestoCommentVote>}
