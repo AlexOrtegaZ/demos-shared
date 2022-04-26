@@ -31,7 +31,6 @@ class ManifestoCommentVoteRepository extends DbHelper {
   }
 
   /**
-   * Create manifesto comment
    * @param {string} manifestoCommentId
    * @param {string} userId
    * @returns {Promise<ManifestoCommentVote>}
@@ -48,7 +47,6 @@ class ManifestoCommentVoteRepository extends DbHelper {
   }
 
   /**
-   * Create manifesto comment
    * @param {string} manifestoCommentId
    * @param {boolean} upvote
    * @param {string} userId
@@ -64,7 +62,6 @@ class ManifestoCommentVoteRepository extends DbHelper {
   }
 
   /**
-   * Create and publish a proposal
    * @param {string} manifestoCommentVoteId
    * @param {boolean} upvote
    * @returns {Promise<ManifestoCommentVote>}
@@ -83,7 +80,6 @@ class ManifestoCommentVoteRepository extends DbHelper {
   }
 
   /**
-   * Create and publish a proposal
    * @param {string} manifestoCommentVoteId
    * @returns {Promise<void>}
    */
