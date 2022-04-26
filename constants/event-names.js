@@ -22,6 +22,7 @@ const eventNames = {
   UPDATED: 'updated',
   INVITATION: 'invitation',
   PUBLISHED: 'published',
+  DELETED: 'deleted'
 };
 
 module.exports = eventNames;

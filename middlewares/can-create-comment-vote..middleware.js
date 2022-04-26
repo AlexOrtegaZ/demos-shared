@@ -17,15 +17,24 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-class ManifestoCommentVote {
-  constructor() {
-    this.manifestoCommentVoteId = "";
-    this.manifestoCommentId = "";
-    this.userId = "";
-    this.upvote = false;
-    this.createdAt = "";
-    this.updatedBy = "";
-  }
-}
+const httpStatus = require('http-status');
+const manifestoCommentVoteRepository = require('../repositories/manifesto-comment-vote.repository');
+const ApiError = require('../utils/ApiError');
 
-module.exports = ManifestoCommentVote;
+const canCreateCommentVote = async (req, _, next) => {
+  const { manifestoCommentId } = req.params;
+  const { userId } = req.user;
+
+  const manifestoCommentVote = await manifestoCommentVoteRepository.findByManifestoCommentIdAndUserId(
+    manifestoCommentId,
+    userId
+  );
+
+  if (manifestoCommentVote) {
+    return next(new ApiError(httpStatus.BAD_REQUEST, 'You cannot vote more than 1 time'));
+  }
+
+  return next();
+};
+
+module.exports = canCreateCommentVote;
