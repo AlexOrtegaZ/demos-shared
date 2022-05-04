@@ -75,21 +75,42 @@ class ProposalRepository extends DbHelper {
    * @param {number} proposalId
    * @param {number} status
    * @param {number} userId
+   * @param {boolean} doNotUpdateExpirationDate
    * @returns {Promise<Proposal>}
    */
-  async updateProposal(proposalId, status, userId) {
+  async updateProposal(proposalId, status, userId, doNotUpdateExpirationDate) {
     const expiredAt = this._getExpirationDateOnIsoString();
+    const updateObject = {
+      status,
+    };
+    if (!doNotUpdateExpirationDate) {
+      updateObject.expired_at = expiredAt;
+    }
+    if (userId) {
+      updateObject.updated_by = userId;
+    }
     const query = SqlQuery.update
       .into(this.tableName)
-      .set({
-        status,
-        updated_by: userId,
-        expired_at: expiredAt,
-      })
+      .set(updateObject)
       .where({ [this.colId]: proposalId })
       .build();
     await excuteQuery(query);
     return this.findById(proposalId);
+  }
+
+  /**
+   * Find all proposal by status 
+   * @param {number} status
+   * @returns {Promise<Proposal[]>}
+   */
+  async findByStatus(status) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        status,
+      })
+      .build();
+    return await excuteQuery(query);
   }
 
   _getExpirationDateOnIsoString() {
