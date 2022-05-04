@@ -56,9 +56,11 @@ class ProposalRepository extends DbHelper {
    * @param {number} status
    * @param {number} spaceId
    * @param {number} userId
+   * @param {number} approvalPercentage
+   * @param {number} participationPercentage
    * @returns {Promise<Proposal>}
    */
-  async createProposal(manifestoId, status, spaceId, userId) {
+  async createProposal(manifestoId, status, spaceId, userId, approvalPercentage, participationPercentage) {
     const newProposal = new Proposal();
     newProposal.manifestoId = manifestoId;
     newProposal.status = status;
@@ -66,6 +68,8 @@ class ProposalRepository extends DbHelper {
     newProposal.createdBy = userId;
     newProposal.updatedBy = userId;
     newProposal.expiredAt = this._getExpirationDateOnIsoString();
+    newProposal.approvalPercentage = approvalPercentage;
+    newProposal.participationPercentage = participationPercentage;
 
     return this.create(newProposal);
   }
@@ -75,17 +79,39 @@ class ProposalRepository extends DbHelper {
    * @param {number} proposalId
    * @param {number} status
    * @param {number} userId
-   * @param {boolean} doNotUpdateExpirationDate
+   * @param {number} approvalPercentage
+   * @param {number} participationPercentage
    * @returns {Promise<Proposal>}
    */
-  async updateProposal(proposalId, status, userId, doNotUpdateExpirationDate) {
+  async updateProposal(proposalId, status, userId, approvalPercentage, participationPercentage) {
     const expiredAt = this._getExpirationDateOnIsoString();
+
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({
+        status,
+        expired_at: expiredAt,
+        approval_percentage: approvalPercentage,
+        participation_percentage: participationPercentage,
+        updated_by: userId,
+      })
+      .where({ [this.colId]: proposalId })
+      .build();
+    await excuteQuery(query);
+    return this.findById(proposalId);
+  }
+
+  /**
+   * Update proposal status
+   * @param {number} proposalId
+   * @param {number} status
+   * @param {number} userId
+   * @returns {Promise<Proposal>}
+   */
+  async updateProposalStatus(proposalId, status, userId) {
     const updateObject = {
       status,
     };
-    if (!doNotUpdateExpirationDate) {
-      updateObject.expired_at = expiredAt;
-    }
     if (userId) {
       updateObject.updated_by = userId;
     }
@@ -99,7 +125,7 @@ class ProposalRepository extends DbHelper {
   }
 
   /**
-   * Find all proposal by status 
+   * Find all proposal by status
    * @param {number} status
    * @returns {Promise<Proposal[]>}
    */
@@ -116,8 +142,8 @@ class ProposalRepository extends DbHelper {
   _getExpirationDateOnIsoString() {
     const dateMilliseconds = new Date().getTime();
     const millisecondsInAnHour = 1000 * 60 * 60;
-    const expirationDateOnMilliseconds = dateMilliseconds + (millisecondsInAnHour * 3);
-    
+    const expirationDateOnMilliseconds = dateMilliseconds + millisecondsInAnHour * 3;
+
     return toIsoString(new Date(expirationDateOnMilliseconds));
   }
 }
