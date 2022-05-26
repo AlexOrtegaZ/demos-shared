@@ -120,6 +120,25 @@ class ProposalVoteRepository extends DbHelper {
       .build();
     await excuteQuery(query);
   }
+
+    /**
+   * Find all proposal votes by proposalIds
+   * @param {string[]} proposalIds
+   * @returns {Promise<ProposalVote[]>}
+   */
+     async findAllByProposalIds(proposalIds) {
+
+      const query = SqlQuery.select
+        .from(this.tableName)
+        .where({
+          proposal_id: proposalIds,
+        })
+        .build();
+  
+      const result = await excuteQuery(query);
+      return result;
+    }
+  
 }
 
 module.exports = new ProposalVoteRepository();

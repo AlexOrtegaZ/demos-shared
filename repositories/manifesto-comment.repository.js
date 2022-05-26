@@ -17,15 +17,17 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const DbHelper = require("./db.helper");
-const ManifestoComment = require("../models/manifesto-comment.model");
+const DbHelper = require('./db.helper');
+const ManifestoComment = require('../models/manifesto-comment.model');
+const SqlQuery = require('../utils/sqlQuery');
+const { excuteQuery } = require('./db.utils');
 
 class ManifestoCommentRepository extends DbHelper {
   constructor() {
     super();
     this.entityName = ManifestoComment.name;
-    this.tableName = "manifesto_comment";
-    this.colId = "manifesto_comment_id";
+    this.tableName = 'manifesto_comment';
+    this.colId = 'manifesto_comment_id';
   }
 
   /**
@@ -36,12 +38,7 @@ class ManifestoCommentRepository extends DbHelper {
    * @param {string} manifesto_id
    * @returns {Promise<ManifestoComment>}
    */
-  async createManifestoComment(
-    content,
-    manifestoCommentParentId,
-    memberId,
-    manifestoId
-  ) {
+  async createManifestoComment(content, manifestoCommentParentId, memberId, manifestoId) {
     const newComment = new ManifestoComment();
     newComment.content = content;
     newComment.manifestoCommentParentId = manifestoCommentParentId;
@@ -49,6 +46,23 @@ class ManifestoCommentRepository extends DbHelper {
     newComment.manifestoId = manifestoId;
 
     return this.create(newComment);
+  }
+
+  /**
+   * Find all manifestos by manifestoIds
+   * @param {string[]} manifestoIds
+   * @returns {Promise<ManifestoComment[]>}
+   */
+  async findAllByManifestoIds(manifestoIds) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        manifesto_id: manifestoIds,
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
   }
 }
 

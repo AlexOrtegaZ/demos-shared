@@ -22,6 +22,7 @@ const Proposal = require('../models/proposal.model');
 const SqlQuery = require('../utils/sqlQuery');
 const { excuteQuery } = require('./db.utils');
 const { toIsoString } = require('../utils/date.utils');
+const { proposalStatusEnum } = require('../enums');
 
 class ProposalRepository extends DbHelper {
   constructor() {
@@ -137,6 +138,26 @@ class ProposalRepository extends DbHelper {
       })
       .build();
     return await excuteQuery(query);
+  }
+
+  /**
+   * Find all proposal by spaceIds
+   * @param {string[]} spaceIds
+   * @returns {Promise<Proposal[]>}
+   */
+  async findAllBySpaceIds(spaceIds) {
+    const statusToIgnore = [proposalStatusEnum.DELETED];
+
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        space_id: spaceIds,
+        status: SqlQuery.sql.not_in(statusToIgnore),
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
   }
 
   _getExpirationDateOnIsoString() {

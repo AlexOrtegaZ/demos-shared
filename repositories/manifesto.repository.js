@@ -59,16 +59,33 @@ class ManifestoRepository extends DbHelper {
   async updateManifesto(manifestoId, manifesto, userId) {
     const query = SqlQuery.update
       .into(this.tableName)
-      .set({ 
+      .set({
         title: manifesto.title,
         content: manifesto.content,
         option_type: manifesto.optionType,
-        updated_by: userId 
+        updated_by: userId,
       })
       .where({ manifesto_id: manifestoId })
       .build();
     await excuteQuery(query);
     return this.findById(manifestoId);
+  }
+
+  /**
+   * Find all manifestos by manifestoIds
+   * @param {string[]} manifestoIds
+   * @returns {Promise<Manifesto[]>}
+   */
+  async findAllByManifestoIds(manifestoIds) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        manifesto_id: manifestoIds,
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
   }
 }
 

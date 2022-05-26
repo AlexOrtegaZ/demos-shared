@@ -91,6 +91,23 @@ class ManifestoCommentVoteRepository extends DbHelper {
 
     await excuteQuery(query);
   }
+
+  /**
+   * Find all manifestos votes by manifestoCommentIds
+   * @param {string[]} manifestoCommentIds
+   * @returns {Promise<ManifestoCommentVote[]>}
+   */
+  async findAllByManifestoCommentIds(manifestoCommentIds) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        manifesto_comment_id: manifestoCommentIds,
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
+  }
 }
 
 module.exports = new ManifestoCommentVoteRepository();
