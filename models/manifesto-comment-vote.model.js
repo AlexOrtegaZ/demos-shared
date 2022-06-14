@@ -20,6 +20,7 @@
 class ManifestoCommentVote {
   constructor() {
     this.manifestoCommentVoteId = "";
+    this.manifestoCommentId = "";
     this.userId = "";
     this.upvote = false;
     this.createdAt = "";

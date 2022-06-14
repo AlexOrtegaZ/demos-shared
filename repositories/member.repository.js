@@ -22,6 +22,7 @@ const Member = require('../models/member.model');
 const { invitationStatusEnum } = require('../enums');
 const SqlQuery = require('../utils/sqlQuery');
 const { excuteQuery } = require('./db.utils');
+const UserRepository = require('./user.repository');
 
 class MemberRepository extends DbHelper {
   constructor() {
@@ -33,18 +34,39 @@ class MemberRepository extends DbHelper {
   }
 
   async findAnyMemberById(memberId) {
-      const query = SqlQuery.select
-        .from(this.tableName)
-        .where({ [this.colId]: memberId })
-        .limit(1)
-        .build();
-  
-      const result = await excuteQuery(query);
-      return result[0];
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({ [this.colId]: memberId })
+      .limit(1)
+      .build();
+
+    const result = await excuteQuery(query);
+    return result[0];
+  }
+
+  async findMemberPhoneNumbers(spaceId) {
+    const invitationStatusToIgnore = [
+      invitationStatusEnum.CANCELED,
+      invitationStatusEnum.REJECTED,
+      invitationStatusEnum.EXPIRED,
+    ];
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .select('member_id', UserRepository.colId)
+      .from(UserRepository.tableName, UserRepository.colId, UserRepository.colId, { joinType: 'inner' })
+      .select('phone_number')
+      .where({ space_id: spaceId, deleted: false, invitation_status: SqlQuery.sql.not_in(invitationStatusToIgnore) })
+      .build();
+    const result = await excuteQuery(query);
+    return result;
   }
 
   async findByUserIdAndSpaceId(userId, spaceId) {
-    const invitationStatusToIgnore = [invitationStatusEnum.CANCELED, invitationStatusEnum.REJECTED, invitationStatusEnum.EXPIRED];
+    const invitationStatusToIgnore = [
+      invitationStatusEnum.CANCELED,
+      invitationStatusEnum.REJECTED,
+      invitationStatusEnum.EXPIRED,
+    ];
 
     const query = SqlQuery.select
       .from(this.tableName)
@@ -127,7 +149,7 @@ class MemberRepository extends DbHelper {
     if (name) {
       updateObject.name = name;
     }
-    if(role) {
+    if (role) {
       updateObject.role = role;
     }
 

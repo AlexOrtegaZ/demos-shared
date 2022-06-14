@@ -135,6 +135,23 @@ class ManifestoOptionRepository extends DbHelper {
       }
     }
   }
+
+  /**
+   * Find all manifestos by manifestoIds
+   * @param {string[]} manifestoIds
+   * @returns {Promise<ManifestoOption[]>}
+   */
+   async findAllByManifestoIds(manifestoIds) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        manifesto_id: manifestoIds,
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
+  }
 }
 
 module.exports = new ManifestoOptionRepository();

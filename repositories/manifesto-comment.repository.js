@@ -47,6 +47,7 @@ class ManifestoCommentRepository extends DbHelper {
 
     return this.create(newComment);
   }
+  
   /**
    * @param {string} manifestoCommentId
    * @param {string} updatedBy
@@ -64,6 +65,23 @@ class ManifestoCommentRepository extends DbHelper {
       });
 
     return excuteQuery(query);
+  }
+
+  /**
+   * Find all manifestos by manifestoIds
+   * @param {string[]} manifestoIds
+   * @returns {Promise<ManifestoComment[]>}
+   */
+  async findAllByManifestoIds(manifestoIds) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        manifesto_id: manifestoIds,
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
   }
 }
 

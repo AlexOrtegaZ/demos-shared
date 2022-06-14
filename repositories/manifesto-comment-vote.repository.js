@@ -17,15 +17,96 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const DbHelper = require("./db.helper");
-const ManifestoCommentVote = require("../models/manifesto-comment-vote.model");
+const DbHelper = require('./db.helper');
+const ManifestoCommentVote = require('../models/manifesto-comment-vote.model');
+const SqlQuery = require('../utils/sqlQuery');
+const { excuteQuery } = require('./db.utils');
 
 class ManifestoCommentVoteRepository extends DbHelper {
   constructor() {
     super();
     this.entityName = ManifestoCommentVote.name;
-    this.tableName = "manifesto_comment_vote";
-    this.colId = "manifesto_comment_vote_id";
+    this.tableName = 'manifesto_comment_vote';
+    this.colId = 'manifesto_comment_vote_id';
+  }
+
+  /**
+   * @param {string} manifestoCommentId
+   * @param {string} userId
+   * @returns {Promise<ManifestoCommentVote>}
+   */
+  async findByManifestoCommentIdAndUserId(manifestoCommentId, userId) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({ manifesto_comment_id: manifestoCommentId, user_id: userId })
+      .limit(1)
+      .build();
+
+    const result = await excuteQuery(query);
+    return result[0];
+  }
+
+  /**
+   * @param {string} manifestoCommentId
+   * @param {boolean} upvote
+   * @param {string} userId
+   * @returns {Promise<ManifestoCommentVote>}
+   */
+  async createManifestoCommentVote(manifestoCommentId, upvote, userId) {
+    const newCommentVote = new ManifestoCommentVote();
+    newCommentVote.manifestoCommentId = manifestoCommentId;
+    newCommentVote.upvote = upvote;
+    newCommentVote.userId = userId;
+
+    return this.create(newCommentVote);
+  }
+
+  /**
+   * @param {string} manifestoCommentVoteId
+   * @param {boolean} upvote
+   * @returns {Promise<ManifestoCommentVote>}
+   */
+  async updateCommentVote(manifestoCommentVoteId, upvote) {
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set({
+        upvote,
+      })
+      .where({ [this.colId]: manifestoCommentVoteId })
+      .build();
+
+    await excuteQuery(query);
+    return this.findById(manifestoCommentVoteId);
+  }
+
+  /**
+   * @param {string} manifestoCommentVoteId
+   * @returns {Promise<void>}
+   */
+  async deleteCommentVote(manifestoCommentVoteId) {
+    const query = SqlQuery.remove
+      .from(this.tableName)
+      .where({ [this.colId]: manifestoCommentVoteId })
+      .build();
+
+    await excuteQuery(query);
+  }
+
+  /**
+   * Find all manifestos votes by manifestoCommentIds
+   * @param {string[]} manifestoCommentIds
+   * @returns {Promise<ManifestoCommentVote[]>}
+   */
+  async findAllByManifestoCommentIds(manifestoCommentIds) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        manifesto_comment_id: manifestoCommentIds,
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
   }
 }
 

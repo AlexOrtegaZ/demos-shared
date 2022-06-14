@@ -121,6 +121,25 @@ class ProposalParticipationRepository extends DbHelper {
   }
 
 
+  /**
+   * Find all proposal participation by proposalIds
+   * @param {string[]} proposalIds
+   * @returns {Promise<ProposalParticipation[]>}
+   */
+   async findAllByProposalIds(proposalIds) {
+
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        proposal_id: proposalIds,
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
+  }
+
+
 }
 
 module.exports = new ProposalParticipationRepository();

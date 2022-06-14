@@ -17,6 +17,7 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//https://www.npmjs.com/package/sql-query
 const sql = require('sql-query');
 
 class SqlQuery {

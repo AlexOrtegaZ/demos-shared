@@ -22,6 +22,7 @@ const Proposal = require('../models/proposal.model');
 const SqlQuery = require('../utils/sqlQuery');
 const { excuteQuery } = require('./db.utils');
 const { toIsoString } = require('../utils/date.utils');
+const { proposalStatusEnum } = require('../enums');
 
 class ProposalRepository extends DbHelper {
   constructor() {
@@ -56,9 +57,11 @@ class ProposalRepository extends DbHelper {
    * @param {number} status
    * @param {number} spaceId
    * @param {number} userId
+   * @param {number} approvalPercentage
+   * @param {number} participationPercentage
    * @returns {Promise<Proposal>}
    */
-  async createProposal(manifestoId, status, spaceId, userId) {
+  async createProposal(manifestoId, status, spaceId, userId, approvalPercentage, participationPercentage) {
     const newProposal = new Proposal();
     newProposal.manifestoId = manifestoId;
     newProposal.status = status;
@@ -66,6 +69,8 @@ class ProposalRepository extends DbHelper {
     newProposal.createdBy = userId;
     newProposal.updatedBy = userId;
     newProposal.expiredAt = this._getExpirationDateOnIsoString();
+    newProposal.approvalPercentage = approvalPercentage;
+    newProposal.participationPercentage = participationPercentage;
 
     return this.create(newProposal);
   }
@@ -75,16 +80,21 @@ class ProposalRepository extends DbHelper {
    * @param {number} proposalId
    * @param {number} status
    * @param {number} userId
+   * @param {number} approvalPercentage
+   * @param {number} participationPercentage
    * @returns {Promise<Proposal>}
    */
-  async updateProposal(proposalId, status, userId) {
+  async updateProposal(proposalId, status, userId, approvalPercentage, participationPercentage) {
     const expiredAt = this._getExpirationDateOnIsoString();
+
     const query = SqlQuery.update
       .into(this.tableName)
       .set({
         status,
-        updated_by: userId,
         expired_at: expiredAt,
+        approval_percentage: approvalPercentage,
+        participation_percentage: participationPercentage,
+        updated_by: userId,
       })
       .where({ [this.colId]: proposalId })
       .build();
@@ -92,11 +102,69 @@ class ProposalRepository extends DbHelper {
     return this.findById(proposalId);
   }
 
+  /**
+   * Update proposal status
+   * @param {number} proposalId
+   * @param {number} status
+   * @param {number} userId
+   * @returns {Promise<Proposal>}
+   */
+  async updateProposalStatus(proposalId, status, userId) {
+    const updateObject = {
+      status,
+    };
+    if (userId) {
+      updateObject.updated_by = userId;
+    }
+    const query = SqlQuery.update
+      .into(this.tableName)
+      .set(updateObject)
+      .where({ [this.colId]: proposalId })
+      .build();
+    await excuteQuery(query);
+    return this.findById(proposalId);
+  }
+
+  /**
+   * Find all proposal by status
+   * @param {number} status
+   * @returns {Promise<Proposal[]>}
+   */
+  async findByStatus(status) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        status,
+      })
+      .build();
+    return await excuteQuery(query);
+  }
+
+  /**
+   * Find all proposal by spaceIds
+   * @param {string[]} spaceIds
+   * @returns {Promise<Proposal[]>}
+   */
+  async findAllBySpaceIds(spaceIds) {
+    const statusToIgnore = [proposalStatusEnum.DELETED];
+
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        space_id: spaceIds,
+        status: SqlQuery.sql.not_in(statusToIgnore),
+      })
+      .build();
+
+    const result = await excuteQuery(query);
+    return result;
+  }
+
   _getExpirationDateOnIsoString() {
     const dateMilliseconds = new Date().getTime();
     const millisecondsInAnHour = 1000 * 60 * 60;
-    const expirationDateOnMilliseconds = dateMilliseconds + (millisecondsInAnHour * 3);
-    
+    const expirationDateOnMilliseconds = dateMilliseconds + millisecondsInAnHour * 3;
+
     return toIsoString(new Date(expirationDateOnMilliseconds));
   }
 }

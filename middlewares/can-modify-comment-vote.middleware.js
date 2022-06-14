@@ -17,22 +17,24 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-class Proposal {
-    constructor() {
-      this.proposalId = '';
-      this.manifestoId = '';
-      this.status = '';
-      this.progressStatus = '';
-      this.spaceId = '';
-      this.expiredAt = '';
-      this.approvalPercentage = undefined;
-      this.participationPercentage = undefined;
-      this.createdBy = undefined;
-      this.createdAt = undefined;
-      this.updatedBy = undefined;
-      this.updatedAt = undefined;
-    }
+const httpStatus = require('http-status');
+const manifestoCommentVoteRepository = require('../repositories/manifesto-comment-vote.repository');
+const ApiError = require('../utils/ApiError');
+
+const canModifyCommentVote = async (req, _, next) => {
+  const { manifestoCommentVoteId } = req.params;
+  const { userId } = req.user;
+
+  const manifestoCommentVote = await manifestoCommentVoteRepository.findById(manifestoCommentVoteId);
+  if (!manifestoCommentVote) {
+    return next(new ApiError(httpStatus.NOT_FOUND, 'Manifesto comment vote not found'));
   }
-  
-  module.exports = Proposal;
-  
+
+  if (manifestoCommentVote.userId != userId) {
+    return next(new ApiError(httpStatus.BAD_REQUEST, 'You can not modify this comment vote'));
+  }
+
+  return next();
+};
+
+module.exports = canModifyCommentVote;

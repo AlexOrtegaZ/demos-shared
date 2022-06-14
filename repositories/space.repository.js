@@ -40,6 +40,7 @@ class SpaceRepository extends DbHelper {
       .from(MemberRepository.tableName, this.colId, this.tableName, this.colId)
       .where({ user_id: userId })
       .order('t1.created_at', 'A')
+      .groupBy(`t1.${this.colId}`)
       .build();
     return excuteQuery(query);
   }

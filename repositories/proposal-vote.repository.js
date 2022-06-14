@@ -68,6 +68,37 @@ class ProposalVoteRepository extends DbHelper {
     return result[0];
   }
 
+  /**
+   * Find Proposal Vote by proposal id
+   * @param {string} proposalId
+   * @returns {Promise<ProposalVote[]>}
+   */
+  async findByProposalId(proposalId) {
+    const query = SqlQuery.select
+      .from(this.tableName)
+      .where({
+        proposal_id: proposalId,
+      })
+      .build();
+
+    return await excuteQuery(query);
+  }
+
+  /**
+   * Remove Proposal Vote by proposalId
+   * @param {string} proposalId
+   * @returns {Promise<void>}
+   */
+   async deleteByProposalId(proposalId) {
+    const query = SqlQuery.remove
+      .from(this.tableName)
+      .where({
+        proposal_id: proposalId,
+      })
+      .build();
+
+    await excuteQuery(query);
+  }
 
   /**
    * Update proposal vote
@@ -89,6 +120,25 @@ class ProposalVoteRepository extends DbHelper {
       .build();
     await excuteQuery(query);
   }
+
+    /**
+   * Find all proposal votes by proposalIds
+   * @param {string[]} proposalIds
+   * @returns {Promise<ProposalVote[]>}
+   */
+     async findAllByProposalIds(proposalIds) {
+
+      const query = SqlQuery.select
+        .from(this.tableName)
+        .where({
+          proposal_id: proposalIds,
+        })
+        .build();
+  
+      const result = await excuteQuery(query);
+      return result;
+    }
+  
 }
 
 module.exports = new ProposalVoteRepository();

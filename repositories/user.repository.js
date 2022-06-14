@@ -50,8 +50,9 @@ class UserRepository extends DbHelper {
   async findAllByIds(userIds) {
     const query = SqlQuery.select.from(this.tableName).where({ user_id: userIds }).build();
 
-    const result = await excuteQuery(query);
-    return result;
+    const users = await excuteQuery(query);
+    users.forEach(u => delete u.phoneNumber);
+    return users;
   }
 
   _getPhoneWithoutExtension(phoneNumber) {
