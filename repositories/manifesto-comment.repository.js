@@ -50,21 +50,21 @@ class ManifestoCommentRepository extends DbHelper {
   
   /**
    * @param {string} manifestoCommentId
-   * @param {string} updatedBy
-   * @returns {Promise<void>}
+   * @returns {Promise<ManifestoComment>}
    */
-  async deleteComment(manifestoCommentId, updatedBy) {
+  async deleteComment(manifestoCommentId) {
     const query = sqlQuery.update
       .into(this.tableName)
       .set({
         deleted: true,
-        updated_by: updatedBy,
+        content: ''
       })
       .where({
         manifesto_comment_id: manifestoCommentId,
-      });
+      }).build();
 
-    return excuteQuery(query);
+    await excuteQuery(query);
+    return this.findById(manifestoCommentId);
   }
 
   /**

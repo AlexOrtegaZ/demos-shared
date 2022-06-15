@@ -21,19 +21,24 @@ const httpStatus = require('http-status');
 const manifestoCommentRepository = require('../repositories/manifesto-comment.repository');
 const ApiError = require('../utils/ApiError');
 
-const isOwnComment = async (req, res, next) => {
+const deleteComment = async (req, _, next) => {
   const { memberId } = req.member;
+  const { manifestoCommentId } = req.params;
 
-  const manifestoComment = await manifestoCommentRepository.findById(manifestoCommentParentId);
+  const manifestoComment = await manifestoCommentRepository.findById(manifestoCommentId);
   if (!manifestoComment) {
     return next(new ApiError(httpStatus.NOT_FOUND, 'Manifesto comment not found'));
   }
 
-  if (manifestoComment.createdByMember === memberId) {
+  if (manifestoComment.deleted) {
+    return next(new ApiError(httpStatus.BAD_REQUEST, 'Comment is deleted'));
+  }
+
+  if (manifestoComment.createdByMember !== memberId) {
     return next(new ApiError(httpStatus.BAD_REQUEST, 'Comment does not belong to this member'));
   }
 
   return next();
 };
 
-module.exports = isOwnComment;
+module.exports = deleteComment;

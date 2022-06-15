@@ -18,7 +18,7 @@
 */
 
 const { COMMENTS } = require('../constants/entity-names');
-const { PUBLISHED } = require('../constants/event-names');
+const { PUBLISHED, UPDATED } = require('../constants/event-names');
 const CacheRepository = require('../repositories/cache.repository');
 const notifyEachActiveMemberOn = require('./utils/utils');
 
@@ -33,6 +33,14 @@ const newComment = async (spaceId, manifestoCommentId, userId) => {
   }, spaceId, userId);
 };
 
+const updateComment = async (spaceId, manifestoCommentId, userId) => {
+  notifyEachActiveMemberOn(async (member) => {
+    const data = { spaceId, manifestoCommentId };
+    await createCommentCache(UPDATED, member.userId, data);
+  }, spaceId, userId);
+};
+
 module.exports = {
-  newComment
+  newComment,
+  updateComment,
 };
