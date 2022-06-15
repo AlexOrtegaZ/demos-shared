@@ -68,6 +68,25 @@ class ManifestoCommentRepository extends DbHelper {
   }
 
   /**
+   * @param {string} manifestoCommentId
+   * @param {string} content
+   * @returns {Promise<ManifestoComment>}
+   */
+   async updateComment(manifestoCommentId, content) {
+    const query = sqlQuery.update
+      .into(this.tableName)
+      .set({
+        content
+      })
+      .where({
+        manifesto_comment_id: manifestoCommentId,
+      }).build();
+
+    await excuteQuery(query);
+    return this.findById(manifestoCommentId);
+  }
+
+  /**
    * Find all manifestos by manifestoIds
    * @param {string[]} manifestoIds
    * @returns {Promise<ManifestoComment[]>}
