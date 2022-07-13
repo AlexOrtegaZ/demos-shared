@@ -18,23 +18,27 @@
 */
 
 const httpStatus = require('http-status');
-const manifestoCommentVoteRepository = require('../repositories/manifesto-comment-vote.repository');
+const manifestoCommentRepository = require('../repositories/manifesto-comment.repository');
 const ApiError = require('../utils/ApiError');
 
-const canModifyCommentVote = async (req, _, next) => {
-  const { manifestoCommentVoteId } = req.params;
-  const { userId } = req.user;
+const deleteComment = async (req, _, next) => {
+  const { memberId } = req.member;
+  const { manifestoCommentId } = req.params;
 
-  const manifestoCommentVote = await manifestoCommentVoteRepository.findById(manifestoCommentVoteId);
-  if (!manifestoCommentVote) {
-    return next(new ApiError(httpStatus.NOT_FOUND, 'Manifesto comment vote not found'));
+  const manifestoComment = await manifestoCommentRepository.findById(manifestoCommentId);
+  if (!manifestoComment) {
+    return next(new ApiError(httpStatus.NOT_FOUND, 'Manifesto comment not found'));
   }
 
-  if (manifestoCommentVote.userId != userId) {
-    return next(new ApiError(httpStatus.BAD_REQUEST, 'You can not modify this comment vote'));
+  if (manifestoComment.deleted) {
+    return next(new ApiError(httpStatus.BAD_REQUEST, 'Comment is deleted'));
+  }
+
+  if (manifestoComment.createdByMember !== memberId) {
+    return next(new ApiError(httpStatus.BAD_REQUEST, 'Comment does not belong to this member'));
   }
 
   return next();
 };
 
-module.exports = canModifyCommentVote;
+module.exports = deleteComment;
